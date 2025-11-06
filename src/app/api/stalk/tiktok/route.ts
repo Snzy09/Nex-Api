@@ -1,0 +1,79 @@
+'use server';
+
+import { NextRequest, NextResponse } from 'next/server';
+import axios from "axios";
+import { siteConfig } from '@/settings/config';
+
+const headers = {
+    "Content-Type": 'application/json',
+    Origin: 'https://tokviewer.net',
+    Referer: 'https://tokviewer.net/id',
+    "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+};
+
+async function ttStalk(username: string, limit: number = 10) {
+    if (!username) {
+        throw new Error('TikTok username is required');
+    }
+    try {
+        const userResponse = await axios.post('https://tokviewer.net/api/check-profile', {
+            "username": username
+        }, {
+            headers
+        });
+
+        if (userResponse.data.error) {
+            throw new Error(userResponse.data.message || 'User not found or failed to fetch profile.');
+        }
+
+        const videoResponse = await axios.post('https://tokviewer.net/api/video', {
+            "username": username,
+            "offset": 0,
+            "limit": limit
+        }, {
+            headers
+        });
+
+        return {
+            profile: userResponse.data.data,
+            videos: videoResponse.data.data
+        };
+    } catch (err: any) {
+        throw new Error(err.response?.data?.message || err.message || 'An unexpected error occurred.');
+    }
+}
+
+async function handleRequest(req: NextRequest, body?: any) {
+    const username = body?.username?.trim() || req.nextUrl.searchParams.get('username')?.trim();
+    const limitParam = body?.limit || req.nextUrl.searchParams.get('limit');
+    const limit = limitParam ? parseInt(limitParam, 10) : 10;
+
+    if (!username) {
+        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'TikTok username (username) parameter is required' }, { status: 400 });
+    }
+
+    try {
+        const result = await ttStalk(username, limit);
+        return NextResponse.json({
+            status: true,
+            creator: siteConfig.api.creator,
+            data: result,
+        });
+    } catch (err: any) {
+        console.error('TikTok Stalk error:', err);
+        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+export async function GET(req: NextRequest) {
+    return handleRequest(req);
+}
+
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        return handleRequest(req, body);
+    } catch (err) {
+        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Invalid JSON body' }, { status: 400 });
+    }
+}
