@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: 'Nex Api 〽️',
-  description: 'A modern API for web scraping with tiered access.',
+  description: 'Modern Api Simple Dan Minimalis Free For All.',
 };
 
 export default function RootLayout({

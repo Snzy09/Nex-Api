@@ -24,7 +24,7 @@ export default function DocumentationPage() {
   .catch(error => console.error('Error:', error));`;
 
   const tutorialCode = `const fetchFeloSearch = async (query) => {
-  const url = \`https://yourapi.com/api/search/felo?query=\${encodeURIComponent(query)}\`;
+  const url = \`https://szhost.biz.id/api/ai/felo?query=\${encodeURIComponent(query)}\`;
   
   try {
     const response = await fetch(url);
@@ -40,7 +40,7 @@ export default function DocumentationPage() {
 };
 
 // Contoh penggunaan:
-fetchFeloSearch('Praktik terbaik Next.js');`;
+fetchFeloSearch('Simple Code Next.js');`;
 
   return (
     <SidebarPage breadcrumbs={breadcrumbs}>
@@ -56,7 +56,7 @@ fetchFeloSearch('Praktik terbaik Next.js');`;
 
         <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
           <AccordionItem value="item-1">
-            <AccordionTrigger>Pendahuluan</AccordionTrigger>
+            <AccordionTrigger>Introduction</AccordionTrigger>
             <AccordionContent>
                 <div className="space-y-4 pt-2 text-muted-foreground">
                     <p>Nex API menyediakan antarmuka yang kuat dan mudah digunakan untuk berbagai layanan berbasis AI. Tujuan kami adalah menyediakan API yang andal, cepat, dan dapat diskalakan yang terintegrasi dengan mulus ke dalam proyek apa pun.</p>
@@ -65,7 +65,7 @@ fetchFeloSearch('Praktik terbaik Next.js');`;
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
-            <AccordionTrigger>Mulai</AccordionTrigger>
+            <AccordionTrigger>Get Started</AccordionTrigger>
             <AccordionContent>
                 <div className="space-y-6 pt-2 text-muted-foreground">
                     <div>
@@ -81,7 +81,7 @@ fetchFeloSearch('Praktik terbaik Next.js');`;
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">
-            <AccordionTrigger>Tutorial</AccordionTrigger>
+            <AccordionTrigger>Tutorials</AccordionTrigger>
             <AccordionContent>
                 <div className="space-y-4 pt-2 text-muted-foreground">
                     <p>Endpoint Felo AI Search (<code className="bg-muted px-1 py-0.5 rounded-sm">/api/search/felo</code>) memungkinkan Anda melakukan pencarian berbasis AI yang kuat.</p>
@@ -97,7 +97,7 @@ fetchFeloSearch('Praktik terbaik Next.js');`;
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-4">
-            <AccordionTrigger>Log Perubahan</AccordionTrigger>
+            <AccordionTrigger>Changelog</AccordionTrigger>
             <AccordionContent>
                  <div className="space-y-6 pt-2">
                     <div>

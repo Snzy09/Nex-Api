@@ -73,7 +73,7 @@ const DATA = {
     name: 'NexSz',
     email: 'sanzzydev@gmail.com',
     avatar:
-      'https://i.imgur.com/mGG2UK5.jpeg',
+      'https://k.top4top.io/p_3597th0j31.png',
   },
   teams: [
     {
@@ -82,14 +82,14 @@ const DATA = {
       plan: 'V 1.0',
     },
     {
-      name: 'Sanzz Nothing 🔅',
+      name: 'Shanz 🔅',
       logo: AudioWaveform,
-      plan: 'Startup',
+      plan: 'Thanks To Shanz For Scrape',
     },
     {
-      name: 'Nothing 🎴',
+      name: 'Sanzz 🎴',
       logo: Command,
-      plan: 'Free',
+      plan: 'Owner',
     },
   ],
   navMain: [
