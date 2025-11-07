@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { SidebarPage } from '@/components/sidebar-page';
 import { Card, CardContent } from '@/components/ui/card';
 import { apiEndpoints } from '@/settings/config';
-import { Folder, ChevronRight, Bot, Database, List, Search, UserSearch } from 'lucide-react';
+import { Folder, Download, Cog, Soup, ImageIcon, Newspaper, Film, BookOpen, ChevronRight, Bot, Database, List, Search, UserSearch } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DashboardPageSkeleton } from '@/components/dashboard/dashboard-page-skeleton';
 import { Separator } from '@/components/ui/separator';
@@ -11,10 +11,15 @@ import { Input } from '@/components/ui/input';
 
 const categoryIcons: { [key: string]: React.ElementType } = {
     ai: Bot,
-    search: Bot,
-    downloaders: Bot,
-    tools: Bot,
+    search: Search,
+    downloaders: Download,
+    tools: Cog,
     stalk: UserSearch,
+    resep: Soup,
+    random: ImageIcon,
+    news: Newspaper,
+    anime: Film,
+    manga: BookOpen,
 };
 
 export default function DashboardPage() {
