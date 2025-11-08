@@ -143,58 +143,67 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
 
 
   return (
-    <AccordionItem value={endpoint.name} className="border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/50">
-      <AccordionTrigger className="p-4 sm:p-6 hover:no-underline group">
-        <div className="flex items-center gap-3 sm:gap-4 w-full">
-            <div className="relative">
-                <Badge className={`w-18 sm:w-22 justify-center text-xs sm:text-sm font-semibold px-3 py-1.5 ${getMethodClass(endpoint.methods[0])} shadow-sm`}>
+    <AccordionItem value={endpoint.name} className="border-0 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 bg-gradient-to-br from-card via-card to-card/80 backdrop-blur-sm">
+      <AccordionTrigger className="p-5 sm:p-7 hover:no-underline group cursor-pointer">
+        <div className="flex items-center gap-4 sm:gap-5 w-full">
+            <div className="relative flex-shrink-0">
+                <div className={`inline-flex items-center justify-center w-20 sm:w-24 h-10 sm:h-12 rounded-xl font-bold text-sm sm:text-base shadow-lg transition-all duration-300 ${
+                    endpoint.methods[0] === 'GET'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
+                        : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700'
+                }`}>
                     {endpoint.methods[0]}
-                </Badge>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+                </div>
+                <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-background shadow-sm ${
+                    endpoint.status === 'online' ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+                }`} />
             </div>
-            <div className='text-left flex-1 min-w-0'>
-                <p className="font-mono text-sm sm:text-base font-medium text-foreground truncate group-hover:text-primary transition-colors">
+            <div className='text-left flex-1 min-w-0 space-y-1'>
+                <p className="font-mono text-base sm:text-lg font-semibold text-foreground truncate group-hover:text-primary transition-colors duration-300">
                     {endpoint.path}
                 </p>
-                <p className="text-sm text-muted-foreground font-normal truncate mt-0.5">
+                <p className="text-sm sm:text-base text-muted-foreground font-medium truncate">
                     {endpoint.name}
                 </p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-                <Badge
-                    variant={endpoint.status === 'online' ? 'default' : 'destructive'}
-                    className={`text-xs px-2 py-1 ${
+                <div className="flex items-center gap-2 pt-1">
+                    <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${
                         endpoint.status === 'online'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                    }`}
-                >
-                    <div className="w-1.5 h-1.5 rounded-full bg-current mr-1.5 animate-pulse" />
-                    {endpoint.status === 'online' ? 'Online' : 'Offline'}
-                </Badge>
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-0.5 transition-transform" />
+                            ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800'
+                            : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800'
+                    }`}>
+                        <div className={`w-2 h-2 rounded-full ${endpoint.status === 'online' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                        {endpoint.status === 'online' ? 'Active' : 'Inactive'}
+                    </div>
+                </div>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+                    <Server className="w-4 h-4" />
+                    <span className="font-medium">API</span>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+                    <ChevronRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
             </div>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="p-0 bg-gradient-to-br from-card/50 to-card">
+      <AccordionContent className="p-0 bg-gradient-to-br from-card/30 via-card/50 to-card/30 border-t border-border/50">
         <Tabs defaultValue="try" className="w-full">
-            <TabsList className="m-3 sm:m-6 grid grid-cols-3 bg-muted/50 p-1 rounded-t-none">
-                <TabsTrigger value="try" className="text-xs sm:text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Play className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <TabsList className="m-4 sm:m-7 grid grid-cols-3 bg-gradient-to-r from-muted/60 via-muted/40 to-muted/60 p-1.5 rounded-t-none border-b border-border/30">
+                <TabsTrigger value="try" className="text-sm sm:text-base font-semibold data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary transition-all duration-300 rounded-lg">
+                    <Play className="mr-2 h-4 w-4" />
                     Try it out
                 </TabsTrigger>
-                <TabsTrigger value="response" className="text-xs sm:text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Server className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                <TabsTrigger value="response" className="text-sm sm:text-base font-semibold data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary transition-all duration-300 rounded-lg">
+                    <Server className="mr-2 h-4 w-4" />
                     Response
                 </TabsTrigger>
-                <TabsTrigger value="curl" className="text-xs sm:text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Code className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                <TabsTrigger value="curl" className="text-sm sm:text-base font-semibold data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary transition-all duration-300 rounded-lg">
+                    <Code className="mr-2 h-4 w-4" />
                     cURL
                 </TabsTrigger>
             </TabsList>
-            <div className="p-4 sm:p-6">
+            <div className="p-6 sm:p-8">
                 <TabsContent value="try" className="space-y-6">
                     <div className="bg-muted/30 rounded-lg p-4 border">
                         <p className="text-muted-foreground text-sm leading-relaxed">{endpoint.description}</p>
