@@ -42,7 +42,7 @@ export const siteConfig = {
       endpoints: [
         {
           name: 'Felo AI Search',
-          path: '/api/search/felo',
+          path: '/api/ai/felo',
           description: 'Get search results from Felo AI.',
           methods: ['GET', 'POST'],
           status: 'online',

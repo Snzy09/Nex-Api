@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { SidebarPage } from '@/components/sidebar-page';
 import { Card, CardContent } from '@/components/ui/card';
 import { apiEndpoints } from '@/settings/config';
-import { Folder, ChevronRight, Bot, Database, List, Search, UserSearch } from 'lucide-react';
+import { Folder, Download, Cog, Soup, ImageIcon, Newspaper, Film, BookOpen, ChevronRight, Bot, Database, List, Search, UserSearch } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DashboardPageSkeleton } from '@/components/dashboard/dashboard-page-skeleton';
 import { Separator } from '@/components/ui/separator';
@@ -11,10 +11,15 @@ import { Input } from '@/components/ui/input';
 
 const categoryIcons: { [key: string]: React.ElementType } = {
     ai: Bot,
-    search: Bot,
-    downloaders: Bot,
-    tools: Bot,
+    search: Search,
+    downloaders: Download,
+    tools: Cog,
     stalk: UserSearch,
+    resep: Soup,
+    random: ImageIcon,
+    news: Newspaper,
+    anime: Film,
+    manga: BookOpen,
 };
 
 export default function DashboardPage() {
@@ -62,16 +67,16 @@ export default function DashboardPage() {
   return (
     <SidebarPage breadcrumbs={breadcrumbs}>
       <div className="space-y-8">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
           {stats.map((stat) => (
             <Card key={stat.label}>
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="bg-primary/10 text-primary p-3 rounded-lg">
+                <div className="bg-primary/10 text-primary p-3 rounded-lg flex-shrink-0">
                     <stat.icon className="h-6 w-6" />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                     <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                    <p className="text-sm font-medium text-muted-foreground truncate">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -91,22 +96,22 @@ export default function DashboardPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <div className="grid gap-4 sm:grid-cols-1">
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {filteredCategories.map((key) => {
                 const category = apiEndpoints[key];
                 const Icon = categoryIcons[key] || Bot;
                 return (
                 <Link href={`/category/${key}`} key={key} passHref>
-                    <Card className="group hover:bg-primary/5 hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="bg-primary/10 text-primary p-3 rounded-lg">
+                    <Card className="group hover:bg-primary/5 hover:shadow-lg transition-all duration-300 h-full">
+                    <CardContent className="p-4 flex items-center gap-4 h-full">
+                        <div className="bg-primary/10 text-primary p-3 rounded-lg flex-shrink-0">
                             <Icon className="h-6 w-6" />
                         </div>
-                        <div className="flex-1">
-                        <p className="font-semibold text-base">{category.name}</p>
-                        <p className="text-sm text-muted-foreground">{category.endpoints.length} endpoints available</p>
+                        <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base truncate">{category.name}</p>
+                        <p className="text-sm text-muted-foreground truncate">{category.endpoints.length} endpoints available</p>
                         </div>
-                        <ChevronRight className="h-6 w-6 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                        <ChevronRight className="h-6 w-6 text-muted-foreground group-hover:translate-x-1 transition-transform flex-shrink-0" />
                     </CardContent>
                     </Card>
                 </Link>

@@ -143,37 +143,37 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
 
   return (
     <AccordionItem value={endpoint.name} className="border rounded-lg overflow-hidden">
-      <AccordionTrigger className="p-4 hover:no-underline bg-card data-[state=open]:border-b">
-        <div className="flex items-center gap-4 w-full">
-            <Badge className={`w-20 justify-center text-sm ${getMethodClass(endpoint.methods[0])}`}>{endpoint.methods[0]}</Badge>
-            <div className='text-left'>
-                <p className="font-mono text-sm">{endpoint.path}</p>
-                <p className="text-xs text-muted-foreground font-normal">{endpoint.name}</p>
+      <AccordionTrigger className="p-3 sm:p-4 hover:no-underline bg-card data-[state=open]:border-b">
+        <div className="flex items-center gap-2 sm:gap-4 w-full">
+            <Badge className={`w-16 sm:w-20 justify-center text-xs sm:text-sm ${getMethodClass(endpoint.methods[0])}`}>{endpoint.methods[0]}</Badge>
+            <div className='text-left flex-1 min-w-0'>
+                <p className="font-mono text-xs sm:text-sm truncate">{endpoint.path}</p>
+                <p className="text-xs text-muted-foreground font-normal truncate">{endpoint.name}</p>
             </div>
-            <Badge variant={endpoint.status === 'online' ? 'secondary' : 'destructive'} className='ml-auto'>
+            <Badge variant={endpoint.status === 'online' ? 'secondary' : 'destructive'} className='ml-auto flex-shrink-0'>
                 {endpoint.status === 'online' ? 'Ready' : 'Offline'}
             </Badge>
         </div>
       </AccordionTrigger>
       <AccordionContent className="p-0 bg-card">
         <Tabs defaultValue="try" className="w-full">
-            <TabsList className="m-4">
-                <TabsTrigger value="try"><Play className="mr-2 h-4 w-4" />Try it out</TabsTrigger>
-                <TabsTrigger value="response"><Server className="mr-2 h-4 w-4" />Response</TabsTrigger>
-                <TabsTrigger value="curl"><Code className="mr-2 h-4 w-4" />cURL</TabsTrigger>
+            <TabsList className="m-2 sm:m-4 grid grid-cols-3">
+                <TabsTrigger value="try" className="text-xs sm:text-sm"><Play className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />Try it out</TabsTrigger>
+                <TabsTrigger value="response" className="text-xs sm:text-sm"><Server className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />Response</TabsTrigger>
+                <TabsTrigger value="curl" className="text-xs sm:text-sm"><Code className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />cURL</TabsTrigger>
             </TabsList>
-            <div className="p-4 border-t">
+            <div className="p-3 sm:p-4 border-t">
                 <TabsContent value="try">
-                    <p className="text-muted-foreground text-sm mb-6">{endpoint.description}</p>
-                    <div className="space-y-4">
+                    <p className="text-muted-foreground text-xs sm:text-sm mb-4 sm:mb-6">{endpoint.description}</p>
+                    <div className="space-y-3 sm:space-y-4">
                         {endpoint.methods.length > 1 && (
                           <Tabs value={activeMethod} onValueChange={(v) => setActiveMethod(v as 'GET' | 'POST')}>
-                            <TabsList>
-                              {endpoint.methods.map(m => <TabsTrigger key={m} value={m}>{m}</TabsTrigger>)}
+                            <TabsList className="grid grid-cols-2 w-full">
+                              {endpoint.methods.map(m => <TabsTrigger key={m} value={m} className="text-xs sm:text-sm">{m}</TabsTrigger>)}
                             </TabsList>
                           </Tabs>
                         )}
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           {endpoint.parameters.map(param => (
                             <div key={param.name} className="space-y-2">
                               <Label htmlFor={param.name} className="flex items-center text-xs">
@@ -181,7 +181,7 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
                               </Label>
                               {param.type === 'select' && param.options ? (
                                  <Select onValueChange={(value) => handleInputChange(param.name, value)} name={param.name}>
-                                    <SelectTrigger className="bg-background">
+                                    <SelectTrigger className="bg-background h-9 sm:h-10">
                                         <SelectValue placeholder={param.description} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -194,7 +194,7 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
                                     type="file"
                                     onChange={(e) => handleInputChange(param.name, e.target.files ? e.target.files[0] : '')}
                                     required={param.required}
-                                    className="bg-background"
+                                    className="bg-background h-9 sm:h-10"
                                     ref={fileInputRef}
                                 />
                               ) : (
@@ -204,14 +204,14 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
                                     placeholder={param.description}
                                     onChange={(e) => handleInputChange(param.name, e.target.value)}
                                     required={param.required}
-                                    className="bg-background"
+                                    className="bg-background h-9 sm:h-10"
                                 />
                               )}
                             </div>
                           ))}
                         </div>
                     </div>
-                    <Button onClick={handleExecute} disabled={isLoading} className="mt-6">
+                    <Button onClick={handleExecute} disabled={isLoading} className="mt-4 sm:mt-6 w-full sm:w-auto">
                         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Execute
                     </Button>

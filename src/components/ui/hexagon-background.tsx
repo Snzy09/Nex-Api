@@ -1,12 +1,12 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, Suspense } from 'react';
 
-const HEXAGON_SIZE = 60;
-const HEXAGON_SPACING = 10;
-const HEXAGONS_PER_ROW = 25;
-const ROW_COUNT = 15;
+const HEXAGON_SIZE = 40;
+const HEXAGON_SPACING = 8;
+const HEXAGONS_PER_ROW = 15;
+const ROW_COUNT = 10;
 
 const Hexagon = React.memo(({
   rowIndex,
@@ -34,8 +34,8 @@ const Hexagon = React.memo(({
     .join(' '), [x, y]);
 
   const animationStyle = useMemo(() => ({
-    animation: `pulse ${Math.random() * 5 + 5}s ease-in-out infinite`,
-    animationDelay: `${Math.random() * 5}s`,
+    animation: `pulse ${Math.random() * 3 + 4}s ease-in-out infinite`,
+    animationDelay: `${Math.random() * 3}s`,
   }), []);
 
   return (
@@ -50,7 +50,7 @@ const Hexagon = React.memo(({
 Hexagon.displayName = 'Hexagon';
 
 
-export const HexagonBackground = ({
+const HexagonBackgroundContent = ({
   className,
 }: {
   className?: string;
@@ -74,7 +74,7 @@ export const HexagonBackground = ({
       ));
     });
   }, []);
-  
+
   if (!isMounted) {
     return null;
   }
@@ -90,12 +90,10 @@ export const HexagonBackground = ({
         {`
           @keyframes pulse {
             0%, 100% {
-              opacity: 0.02;
-              transform: scale(0.95);
+              opacity: 0.03;
             }
             50% {
-              opacity: 0.07;
-              transform: scale(1);
+              opacity: 0.06;
             }
           }
         `}
@@ -107,5 +105,17 @@ export const HexagonBackground = ({
       </svg>
       <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
     </div>
+  );
+};
+
+export const HexagonBackground = ({
+  className,
+}: {
+  className?: string;
+}) => {
+  return (
+    <Suspense fallback={null}>
+      <HexagonBackgroundContent className={className} />
+    </Suspense>
   );
 };
