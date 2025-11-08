@@ -12,7 +12,7 @@ import { CodeBlock } from '@/components/dashboard/code-block';
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, AlertTriangle, CheckCircle, Search, List, Play, Code, Server, Image as ImageIcon } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, Search, List, Play, Code, Server, Image as ImageIcon, ChevronRight } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SidebarPage } from '@/components/sidebar-page';
 import { CategoryPageSkeleton } from '@/components/dashboard/category-page-skeleton';
@@ -143,79 +143,134 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
 
 
   return (
-    <AccordionItem value={endpoint.name} className="border rounded-lg overflow-hidden">
-      <AccordionTrigger className="p-3 sm:p-4 hover:no-underline bg-card data-[state=open]:border-b">
-        <div className="flex items-center gap-2 sm:gap-4 w-full">
-            <Badge className={`w-16 sm:w-20 justify-center text-xs sm:text-sm ${getMethodClass(endpoint.methods[0])}`}>{endpoint.methods[0]}</Badge>
-            <div className='text-left flex-1 min-w-0'>
-                <p className="font-mono text-xs sm:text-sm truncate">{endpoint.path}</p>
-                <p className="text-xs text-muted-foreground font-normal truncate">{endpoint.name}</p>
+    <AccordionItem value={endpoint.name} className="border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-card/50">
+      <AccordionTrigger className="p-4 sm:p-6 hover:no-underline group">
+        <div className="flex items-center gap-3 sm:gap-4 w-full">
+            <div className="relative">
+                <Badge className={`w-18 sm:w-22 justify-center text-xs sm:text-sm font-semibold px-3 py-1.5 ${getMethodClass(endpoint.methods[0])} shadow-sm`}>
+                    {endpoint.methods[0]}
+                </Badge>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse" />
             </div>
-            <Badge variant={endpoint.status === 'online' ? 'secondary' : 'destructive'} className='ml-auto flex-shrink-0'>
-                {endpoint.status === 'online' ? 'Ready' : 'Offline'}
-            </Badge>
+            <div className='text-left flex-1 min-w-0'>
+                <p className="font-mono text-sm sm:text-base font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                    {endpoint.path}
+                </p>
+                <p className="text-sm text-muted-foreground font-normal truncate mt-0.5">
+                    {endpoint.name}
+                </p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+                <Badge
+                    variant={endpoint.status === 'online' ? 'default' : 'destructive'}
+                    className={`text-xs px-2 py-1 ${
+                        endpoint.status === 'online'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                    }`}
+                >
+                    <div className="w-1.5 h-1.5 rounded-full bg-current mr-1.5 animate-pulse" />
+                    {endpoint.status === 'online' ? 'Online' : 'Offline'}
+                </Badge>
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-0.5 transition-transform" />
+                </div>
+            </div>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="p-0 bg-card">
+      <AccordionContent className="p-0 bg-gradient-to-br from-card/50 to-card">
         <Tabs defaultValue="try" className="w-full">
-            <TabsList className="m-2 sm:m-4 grid grid-cols-3">
-                <TabsTrigger value="try" className="text-xs sm:text-sm"><Play className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />Try it out</TabsTrigger>
-                <TabsTrigger value="response" className="text-xs sm:text-sm"><Server className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />Response</TabsTrigger>
-                <TabsTrigger value="curl" className="text-xs sm:text-sm"><Code className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />cURL</TabsTrigger>
+            <TabsList className="m-3 sm:m-6 grid grid-cols-3 bg-muted/50 p-1 rounded-t-none">
+                <TabsTrigger value="try" className="text-xs sm:text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Play className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    Try it out
+                </TabsTrigger>
+                <TabsTrigger value="response" className="text-xs sm:text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Server className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    Response
+                </TabsTrigger>
+                <TabsTrigger value="curl" className="text-xs sm:text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Code className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    cURL
+                </TabsTrigger>
             </TabsList>
-            <div className="p-3 sm:p-4 border-t">
-                <TabsContent value="try">
-                    <p className="text-muted-foreground text-xs sm:text-sm mb-4 sm:mb-6">{endpoint.description}</p>
-                    <div className="space-y-3 sm:space-y-4">
+            <div className="p-4 sm:p-6">
+                <TabsContent value="try" className="space-y-6">
+                    <div className="bg-muted/30 rounded-lg p-4 border">
+                        <p className="text-muted-foreground text-sm leading-relaxed">{endpoint.description}</p>
+                    </div>
+                    <div className="space-y-4">
                         {endpoint.methods.length > 1 && (
-                          <Tabs value={activeMethod} onValueChange={(v) => setActiveMethod(v as 'GET' | 'POST')}>
-                            <TabsList className="grid grid-cols-2 w-full">
-                              {endpoint.methods.map(m => <TabsTrigger key={m} value={m} className="text-xs sm:text-sm">{m}</TabsTrigger>)}
-                            </TabsList>
-                          </Tabs>
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">HTTP Method</Label>
+                            <Tabs value={activeMethod} onValueChange={(v) => setActiveMethod(v as 'GET' | 'POST')}>
+                              <TabsList className="grid grid-cols-2 w-full">
+                                {endpoint.methods.map(m => (
+                                  <TabsTrigger key={m} value={m} className="text-sm font-medium">
+                                    {m}
+                                  </TabsTrigger>
+                                ))}
+                              </TabsList>
+                            </Tabs>
+                          </div>
                         )}
-                        <div className="space-y-3 sm:space-y-4">
-                          {endpoint.parameters.map(param => (
-                            <div key={param.name} className="space-y-2">
-                              <Label htmlFor={param.name} className="flex items-center text-xs">
-                                {param.name} {param.required && <span className="text-red-500 ml-1">*</span>}
-                              </Label>
-                              {param.type === 'select' && param.options ? (
-                                 <Select onValueChange={(value) => handleInputChange(param.name, value)} name={param.name}>
-                                    <SelectTrigger className="bg-background h-9 sm:h-10">
-                                        <SelectValue placeholder={param.description} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {param.options.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                              ) : param.type === 'file' ? (
-                                <Input
-                                    id={param.name}
-                                    type="file"
-                                    onChange={(e) => handleInputChange(param.name, e.target.files ? e.target.files[0] : '')}
-                                    required={param.required}
-                                    className="bg-background h-9 sm:h-10"
-                                    ref={fileInputRef}
-                                />
-                              ) : (
-                                <Input
-                                    id={param.name}
-                                    type={param.type}
-                                    placeholder={param.description}
-                                    onChange={(e) => handleInputChange(param.name, e.target.value)}
-                                    required={param.required}
-                                    className="bg-background h-9 sm:h-10"
-                                />
-                              )}
-                            </div>
-                          ))}
+                        <div className="space-y-4">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <List className="h-4 w-4" />
+                            Parameters
+                          </Label>
+                          <div className="grid gap-4">
+                            {endpoint.parameters.map(param => (
+                              <div key={param.name} className="space-y-2">
+                                <Label htmlFor={param.name} className="flex items-center text-sm font-medium">
+                                  {param.name}
+                                  {param.required && <span className="text-red-500 ml-1 text-xs">*</span>}
+                                </Label>
+                                {param.type === 'select' && param.options ? (
+                                   <Select onValueChange={(value) => handleInputChange(param.name, value)} name={param.name}>
+                                      <SelectTrigger className="bg-background h-11 border-2 focus:border-primary/50 transition-colors">
+                                          <SelectValue placeholder={param.description} />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                          {param.options.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                                      </SelectContent>
+                                  </Select>
+                                ) : param.type === 'file' ? (
+                                  <div className="space-y-2">
+                                    <Input
+                                        id={param.name}
+                                        type="file"
+                                        onChange={(e) => handleInputChange(param.name, e.target.files ? e.target.files[0] : '')}
+                                        required={param.required}
+                                        className="bg-background h-11 border-2 focus:border-primary/50 transition-colors file:bg-primary file:text-primary-foreground file:border-0 file:rounded file:px-3 file:py-1 file:mr-3 file:text-sm"
+                                        ref={fileInputRef}
+                                    />
+                                    <p className="text-xs text-muted-foreground">{param.description}</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2">
+                                    <Input
+                                        id={param.name}
+                                        type={param.type}
+                                        placeholder={param.description}
+                                        onChange={(e) => handleInputChange(param.name, e.target.value)}
+                                        required={param.required}
+                                        className="bg-background h-11 border-2 focus:border-primary/50 transition-colors"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                     </div>
-                    <Button onClick={handleExecute} disabled={isLoading} className="mt-4 sm:mt-6 w-full sm:w-auto">
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Execute
-                    </Button>
+                    <div className="flex justify-end pt-4 border-t">
+                        <Button onClick={handleExecute} disabled={isLoading} size="lg" className="px-8 shadow-sm hover:shadow-md transition-shadow">
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            <Play className="mr-2 h-4 w-4" />
+                            Execute Request
+                        </Button>
+                    </div>
                 </TabsContent>
                 <TabsContent value="response">
                     {response ? (
