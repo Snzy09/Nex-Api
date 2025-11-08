@@ -218,47 +218,49 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
                 </TabsContent>
                 <TabsContent value="response">
                     {response ? (
-                        <div className='space-y-4'>
-                            <h4 className="font-semibold">Response</h4>
+                        <div className='space-y-3 sm:space-y-4'>
+                            <h4 className="font-semibold text-sm sm:text-base">Response</h4>
                             <Card className="bg-background">
-                                <CardHeader>
-                                    <CardTitle className='text-sm'>Status: {response.status}</CardTitle>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className='text-xs sm:text-sm'>Status: {response.status}</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <ScrollArea className="h-72 w-full">
+                                <CardContent className="pt-0">
+                                    <ScrollArea className="h-48 sm:h-72 w-full">
                                         <CodeBlock text={JSON.stringify(response.data, null, 2)} />
                                     </ScrollArea>
                                 </CardContent>
                             </Card>
                         </div>
                     ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <p>Execute the request to see the response here.</p>
+                        <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                            <p className="text-sm">Execute the request to see the response here.</p>
                         </div>
                     )}
-                     <div className="space-y-4 mt-8">
-                        <div className="font-semibold flex items-center gap-2 text-sm">
-                            <List className="h-4 w-4" />
+                     <div className="space-y-3 sm:space-y-4 mt-6 sm:mt-8">
+                        <div className="font-semibold flex items-center gap-2 text-xs sm:text-sm">
+                            <List className="h-3 w-3 sm:h-4 sm:w-4" />
                             HTTP STATUS CODES
                         </div>
                         <div className="border rounded-lg overflow-hidden bg-background">
-                            <div className="grid grid-cols-[80px_1fr] p-2 font-semibold bg-muted text-xs">
+                            <div className="grid grid-cols-[60px_1fr] sm:grid-cols-[80px_1fr] p-2 font-semibold bg-muted text-xs">
                                 <div>Code</div>
                                 <div>Description</div>
                             </div>
                             {httpStatusCodes.map(status => (
-                                <div key={status.code} className="grid grid-cols-[80px_1fr] p-2 border-t items-center text-sm">
-                                    <div className='flex items-center gap-2 font-mono'>{status.icon} {status.code}</div>
-                                    <div>{status.description}</div>
+                                <div key={status.code} className="grid grid-cols-[60px_1fr] sm:grid-cols-[80px_1fr] p-2 border-t items-center text-xs sm:text-sm">
+                                    <div className='flex items-center gap-1 sm:gap-2 font-mono'>{status.icon} {status.code}</div>
+                                    <div className="truncate">{status.description}</div>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </TabsContent>
                 <TabsContent value="curl">
-                    <div className="space-y-4">
-                        <h4 className="font-semibold">cURL Command</h4>
-                        <CodeBlock text={getCurlCommand(activeMethod)} />
+                    <div className="space-y-3 sm:space-y-4">
+                        <h4 className="font-semibold text-sm sm:text-base">cURL Command</h4>
+                        <div className="overflow-x-auto">
+                            <CodeBlock text={getCurlCommand(activeMethod)} />
+                        </div>
                     </div>
                 </TabsContent>
             </div>
@@ -307,11 +309,11 @@ export default function CategoryPage() {
     <SidebarPage breadcrumbs={breadcrumbs}>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-              {category.name}
-              <Badge>{category.endpoints.length} Endpoints</Badge>
+          <h1 className="text-2xl sm:text-3xl font-bold flex flex-col sm:flex-row sm:items-center gap-2">
+              <span className="truncate">{category.name}</span>
+              <Badge className="w-fit">{category.endpoints.length} Endpoints</Badge>
           </h1>
-          <p className="text-muted-foreground mt-2">{category.description}</p>
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">{category.description}</p>
         </div>
 
         <div className="relative">
