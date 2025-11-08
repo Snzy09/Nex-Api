@@ -87,3 +87,42 @@
     animation: blink-caret .75s step-end infinite;
   }
 }
+
+/* Prevent zoom on touch devices */
+@media screen and (max-width: 768px) {
+  html {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+
+  * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Allow text selection in input fields */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
+/* Prevent zoom gestures */
+* {
+  touch-action: manipulation;
+}
+
+/* Ensure consistent zoom behavior */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
