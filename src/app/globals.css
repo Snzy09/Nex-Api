@@ -126,3 +126,57 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
+
+/* Optimize for Android 300x800 resolution */
+@media screen and (max-width: 400px) and (max-height: 900px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* Reduce padding and margins for small screens */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Optimize sidebar for narrow screens */
+  [data-sidebar] {
+    width: 280px;
+  }
+
+  /* Make cards more compact */
+  .grid {
+    gap: 0.75rem;
+  }
+
+  /* Optimize header spacing */
+  header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Make text more readable on small screens */
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  /* Optimize button sizes */
+  .btn, button {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Ensure touch targets are at least 44px */
+  a, button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

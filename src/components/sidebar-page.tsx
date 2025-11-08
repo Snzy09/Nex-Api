@@ -406,7 +406,7 @@ export const SidebarPage = ({
           </div>
         </header>
         <div className="flex flex-1 flex-col min-h-0">
-          <main className="container relative flex-1 py-4 sm:py-8 min-h-0 max-w-full overflow-hidden">
+          <main className="container relative flex-1 py-2 sm:py-4 lg:py-8 min-h-0 max-w-full overflow-hidden">
             <HexagonBackground />
             <div className="relative z-10 w-full max-w-full overflow-hidden">
               {children}
