@@ -343,8 +343,8 @@ export const SidebarPage = ({
       </Sidebar>
 
       <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center gap-2 border-b">
-          <div className="flex items-center gap-2 px-4">
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-2 sm:px-4">
+          <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
@@ -369,12 +369,12 @@ export const SidebarPage = ({
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className="ml-auto flex items-center gap-2 px-4">
+          <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
           </div>
         </header>
         <div className="flex flex-1 flex-col">
-          <main className="container relative flex-1 py-8">
+          <main className="container relative flex-1 py-4 sm:py-8">
             <HexagonBackground />
             {children}
           </main>
