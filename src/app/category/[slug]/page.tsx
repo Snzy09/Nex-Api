@@ -16,6 +16,7 @@ import { Loader2, AlertTriangle, CheckCircle, Search, List, Play, Code, Server, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SidebarPage } from '@/components/sidebar-page';
 import { CategoryPageSkeleton } from '@/components/dashboard/category-page-skeleton';
+import { InfoCard } from '@/components/dashboard/info-card';
 import Image from 'next/image';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -225,8 +226,10 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
                                     <CardTitle className='text-xs sm:text-sm'>Status: {response.status}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-0">
-                                    <ScrollArea className="h-48 sm:h-72 w-full">
-                                        <CodeBlock text={JSON.stringify(response.data, null, 2)} />
+                                    <ScrollArea className="h-48 sm:h-72 w-full max-w-full">
+                                        <div className="w-full overflow-hidden">
+                                            <CodeBlock text={JSON.stringify(response.data, null, 2)} />
+                                        </div>
                                     </ScrollArea>
                                 </CardContent>
                             </Card>
@@ -258,8 +261,10 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
                 <TabsContent value="curl">
                     <div className="space-y-3 sm:space-y-4">
                         <h4 className="font-semibold text-sm sm:text-base">cURL Command</h4>
-                        <div className="overflow-x-auto">
-                            <CodeBlock text={getCurlCommand(activeMethod)} />
+                        <div className="w-full overflow-hidden">
+                            <div className="overflow-x-auto max-w-full">
+                                <CodeBlock text={getCurlCommand(activeMethod)} />
+                            </div>
                         </div>
                     </div>
                 </TabsContent>
@@ -308,25 +313,39 @@ export default function CategoryPage() {
   return (
     <SidebarPage breadcrumbs={breadcrumbs}>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold flex flex-col sm:flex-row sm:items-center gap-2">
-              <span className="truncate">{category.name}</span>
-              <Badge className="w-fit">{category.endpoints.length} Endpoints</Badge>
-          </h1>
-          <p className="text-muted-foreground mt-2 text-sm sm:text-base">{category.description}</p>
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full max-w-full overflow-hidden">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex flex-col sm:flex-row sm:items-center gap-2">
+                <span className="truncate">{category.name}</span>
+                <Badge className="w-fit flex-shrink-0">{category.endpoints.length} Endpoints</Badge>
+            </h1>
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base break-words overflow-wrap-anywhere">{category.description}</p>
+          </div>
         </div>
 
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-              placeholder="Search endpoints..."
-              className="pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 w-full max-w-full overflow-hidden">
+          <InfoCard
+              title="Endpoints in Category"
+              icon={List}
+              content={<div className="text-2xl font-bold">{category.endpoints.length}</div>}
           />
+          <InfoCard
+              title="Online Endpoints"
+              icon={CheckCircle}
+              content={<div className="text-2xl font-bold">{category.endpoints.filter(e => e.status === 'online').length}</div>}
+          />
+          <div className="relative sm:col-span-2 lg:col-span-3 w-full max-w-full overflow-hidden">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <Input
+                placeholder="Search endpoints..."
+                className="pl-10 w-full max-w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
-        <Accordion type="single" collapsible className="w-full space-y-2">
+        <Accordion type="single" collapsible className="w-full space-y-2 max-w-full overflow-hidden">
           {filteredEndpoints.map(endpoint => (
             <ApiEndpointComponent key={endpoint.name} endpoint={endpoint} />
           ))}
