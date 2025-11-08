@@ -143,14 +143,14 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
 
   return (
     <AccordionItem value={endpoint.name} className="border rounded-lg overflow-hidden">
-      <AccordionTrigger className="p-4 hover:no-underline bg-card data-[state=open]:border-b">
-        <div className="flex items-center gap-4 w-full">
-            <Badge className={`w-20 justify-center text-sm ${getMethodClass(endpoint.methods[0])}`}>{endpoint.methods[0]}</Badge>
-            <div className='text-left'>
-                <p className="font-mono text-sm">{endpoint.path}</p>
-                <p className="text-xs text-muted-foreground font-normal">{endpoint.name}</p>
+      <AccordionTrigger className="p-3 sm:p-4 hover:no-underline bg-card data-[state=open]:border-b">
+        <div className="flex items-center gap-2 sm:gap-4 w-full">
+            <Badge className={`w-16 sm:w-20 justify-center text-xs sm:text-sm ${getMethodClass(endpoint.methods[0])}`}>{endpoint.methods[0]}</Badge>
+            <div className='text-left flex-1 min-w-0'>
+                <p className="font-mono text-xs sm:text-sm truncate">{endpoint.path}</p>
+                <p className="text-xs text-muted-foreground font-normal truncate">{endpoint.name}</p>
             </div>
-            <Badge variant={endpoint.status === 'online' ? 'secondary' : 'destructive'} className='ml-auto'>
+            <Badge variant={endpoint.status === 'online' ? 'secondary' : 'destructive'} className='ml-auto flex-shrink-0'>
                 {endpoint.status === 'online' ? 'Ready' : 'Offline'}
             </Badge>
         </div>
