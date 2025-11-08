@@ -173,61 +173,64 @@ export const SidebarPage = ({
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" variant="inset">
-        <SidebarHeader>
-          {/* Team Switcher */}
+      <Sidebar collapsible="icon" variant="inset" className="border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <SidebarHeader className="border-b border-sidebar-border/50 p-4">
           <SidebarMenu>
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    className="w-full data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 transition-colors"
                   >
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                      <activeTeam.logo className="size-4" />
+                    <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm">
+                      <activeTeam.logo className="size-5" />
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{activeTeam.name}</span>
-                      <span className="truncate text-xs">{activeTeam.plan}</span>
+                      <span className="truncate font-bold text-foreground">{activeTeam.name}</span>
+                      <span className="truncate text-xs text-muted-foreground font-medium">{activeTeam.plan}</span>
                     </div>
-                    <ChevronsUpDown className="ml-auto" />
+                    <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                  className="w-[--radix-dropdown-menu-trigger-width] min-w-64 rounded-xl border shadow-lg"
                   align="start"
                   side={isMobile ? 'bottom' : 'right'}
-                  sideOffset={4}
+                  sideOffset={8}
                 >
-                  <DropdownMenuLabel className="text-xs text-muted-foreground">
-                    Teams
+                  <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground px-3 py-2">
+                    Switch Team
                   </DropdownMenuLabel>
                   {DATA.teams.map((team, index) => (
                     <DropdownMenuItem
                       key={team.name}
                       onClick={() => setActiveTeam(team)}
-                      className="gap-2 p-2"
+                      className="gap-3 p-3 rounded-lg hover:bg-accent focus:bg-accent transition-colors"
                     >
-                      <div className="flex size-6 items-center justify-center rounded-sm border">
+                      <div className="flex size-8 items-center justify-center rounded-lg border bg-gradient-to-br from-primary/10 to-primary/5">
                         <team.logo className="size-4 shrink-0" />
                       </div>
-                      {team.name}
-                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{team.name}</span>
+                        <span className="text-xs text-muted-foreground">{team.plan}</span>
+                      </div>
+                      <DropdownMenuShortcut className="ml-auto text-xs">⌘{index + 1}</DropdownMenuShortcut>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
           </SidebarMenu>
-          {/* Team Switcher */}
         </SidebarHeader>
 
-        <SidebarContent>
+        <SidebarContent className="px-3 py-4">
           {/* Nav Main */}
-          <SidebarGroup>
-            <SidebarGroupLabel>Feature</SidebarGroupLabel>
-            <SidebarMenu>
+          <SidebarGroup className="mb-6">
+            <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-3">
+              Navigation
+            </SidebarGroupLabel>
+            <SidebarMenu className="space-y-1">
               {DATA.navMain.map((item) => {
                 const isActive = pathname === item.url;
                 if (!item.items) {
@@ -237,10 +240,11 @@ export const SidebarPage = ({
                         tooltip={item.title}
                         asChild
                         isActive={isActive}
+                        className="h-10 px-3 rounded-lg hover:bg-sidebar-accent/50 transition-colors data-[active=true]:bg-primary data-[active=true]:text-primary-foreground data-[active=true]:shadow-sm"
                       >
-                        <a href={item.url}>
-                          {item.icon && <item.icon />}
-                          <span>{item.title}</span>
+                        <a href={item.url} className="flex items-center gap-3">
+                          {item.icon && <item.icon className="h-4 w-4" />}
+                          <span className="font-medium">{item.title}</span>
                         </a>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -258,23 +262,27 @@ export const SidebarPage = ({
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={item.title} asChild>
-                          <a href={item.url}>
-                            {item.icon && <item.icon />}
-                            <span>{item.title}</span>
-                            <ChevronRight className="ml-auto transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90" />
+                        <SidebarMenuButton
+                          tooltip={item.title}
+                          className="h-10 px-3 rounded-lg hover:bg-sidebar-accent/50 transition-colors data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
+                        >
+                          <a href={item.url} className="flex items-center gap-3 flex-1">
+                            {item.icon && <item.icon className="h-4 w-4" />}
+                            <span className="font-medium">{item.title}</span>
+                            <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90" />
                           </a>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
+                      <CollapsibleContent className="ml-6 mt-1">
+                        <SidebarMenuSub className="space-y-1">
                           {item.items?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
                                 isActive={pathname === subItem.url}
                                 asChild
+                                className="h-8 px-3 rounded-md hover:bg-sidebar-accent/30 transition-colors data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium"
                               >
-                                <a href={subItem.url}>
+                                <a href={subItem.url} className="text-sm">
                                   <span>{subItem.title}</span>
                                 </a>
                               </SidebarMenuSubButton>
@@ -288,10 +296,13 @@ export const SidebarPage = ({
               })}
             </SidebarMenu>
           </SidebarGroup>
+
           {/* API Categories */}
           <SidebarGroup>
-            <SidebarGroupLabel>Our Category Feature</SidebarGroupLabel>
-            <SidebarMenu>
+            <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-3">
+              API Categories
+            </SidebarGroupLabel>
+            <SidebarMenu className="space-y-1">
               {Object.keys(apiEndpoints).map((categoryKey) => {
                 const category = apiEndpoints[categoryKey];
                 const href = `/category/${categoryKey}`;
@@ -303,10 +314,11 @@ export const SidebarPage = ({
                       tooltip={category.name}
                       asChild
                       isActive={isActive}
+                      className="h-10 px-3 rounded-lg hover:bg-sidebar-accent/50 transition-colors data-[active=true]:bg-primary data-[active=true]:text-primary-foreground data-[active=true]:shadow-sm"
                     >
-                      <a href={href}>
-                        <Icon />
-                        <span>{category.name}</span>
+                      <a href={href} className="flex items-center gap-3">
+                        <Icon className="h-4 w-4" />
+                        <span className="font-medium">{category.name}</span>
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -315,62 +327,65 @@ export const SidebarPage = ({
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter>
-          {/* Nav User */}
+        <SidebarFooter className="border-t border-sidebar-border/50 p-4">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="lg"
+                className="h-12 px-3 rounded-lg hover:bg-sidebar-accent/50 transition-colors"
               >
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="h-9 w-9 rounded-xl border-2 border-primary/20">
                   <AvatarImage src={activeUser.avatar} alt={activeUser.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-semibold">
+                    {activeUser.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <div className="flex items-center gap-1">
-                    <span className="truncate font-semibold">{activeUser.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="truncate font-semibold text-foreground">{activeUser.name}</span>
                     {isPrivilegedUser && (
                       <BadgeCheck className="size-4 shrink-0 text-primary" />
                     )}
                   </div>
-                  <span className="truncate text-xs">{activeUser.email}</span>
+                  <span className="truncate text-xs text-muted-foreground font-medium">{activeUser.email}</span>
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-          {/* Nav User */}
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
 
       <SidebarInset className="flex flex-col min-h-screen">
-        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-2 sm:px-4">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-3 sm:px-6">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <SidebarTrigger className="h-8 w-8 hover:bg-accent hover:text-accent-foreground transition-colors" />
+            <Separator orientation="vertical" className="h-6" />
             <Breadcrumb className="min-w-0 flex-1">
               <BreadcrumbList className="flex-nowrap">
                 <BreadcrumbItem className="flex-shrink-0">
-                  <BreadcrumbLink href="/">Nex Api 〽️</BreadcrumbLink>
+                  <BreadcrumbLink href="/" className="font-semibold text-primary hover:text-primary/80 transition-colors">
+                    Nex Api 〽️
+                  </BreadcrumbLink>
                 </BreadcrumbItem>
-                {breadcrumbs.length > 0 && <BreadcrumbSeparator />}
+                {breadcrumbs.length > 0 && <BreadcrumbSeparator className="text-muted-foreground/50" />}
                 {breadcrumbs.length > 1 ? (
                   <>
-                    <BreadcrumbItem className="hidden sm:flex">
-                      <BreadcrumbEllipsis />
+                    <BreadcrumbItem className="hidden md:flex">
+                      <BreadcrumbEllipsis className="text-muted-foreground/70" />
                     </BreadcrumbItem>
-                    <BreadcrumbSeparator className="hidden sm:flex" />
+                    <BreadcrumbSeparator className="hidden md:flex text-muted-foreground/50" />
                     <BreadcrumbItem className="truncate">
                       {breadcrumbs[breadcrumbs.length - 1].href ? (
-                        <BreadcrumbLink href={breadcrumbs[breadcrumbs.length - 1].href}>
-                          {breadcrumbs[breadcrumbs.length - 1].label.length > 10
-                            ? `${breadcrumbs[breadcrumbs.length - 1].label.substring(0, 10)}...`
+                        <BreadcrumbLink href={breadcrumbs[breadcrumbs.length - 1].href} className="hover:text-foreground transition-colors">
+                          {breadcrumbs[breadcrumbs.length - 1].label.length > 12
+                            ? `${breadcrumbs[breadcrumbs.length - 1].label.substring(0, 12)}...`
                             : breadcrumbs[breadcrumbs.length - 1].label}
                         </BreadcrumbLink>
                       ) : (
-                        <BreadcrumbPage className="truncate">
-                          {breadcrumbs[breadcrumbs.length - 1].label.length > 10
-                            ? `${breadcrumbs[breadcrumbs.length - 1].label.substring(0, 10)}...`
+                        <BreadcrumbPage className="truncate font-medium">
+                          {breadcrumbs[breadcrumbs.length - 1].label.length > 12
+                            ? `${breadcrumbs[breadcrumbs.length - 1].label.substring(0, 12)}...`
                             : breadcrumbs[breadcrumbs.length - 1].label}
                         </BreadcrumbPage>
                       )}
@@ -381,27 +396,27 @@ export const SidebarPage = ({
                     <React.Fragment key={index}>
                       <BreadcrumbItem className="truncate">
                         {crumb.href ? (
-                          <BreadcrumbLink href={crumb.href}>
-                            {crumb.label.length > 10
-                              ? `${crumb.label.substring(0, 10)}...`
+                          <BreadcrumbLink href={crumb.href} className="hover:text-foreground transition-colors">
+                            {crumb.label.length > 12
+                              ? `${crumb.label.substring(0, 12)}...`
                               : crumb.label}
                           </BreadcrumbLink>
                         ) : (
-                          <BreadcrumbPage className="truncate">
-                            {crumb.label.length > 10
-                              ? `${crumb.label.substring(0, 10)}...`
+                          <BreadcrumbPage className="truncate font-medium">
+                            {crumb.label.length > 12
+                              ? `${crumb.label.substring(0, 12)}...`
                               : crumb.label}
                           </BreadcrumbPage>
                         )}
                       </BreadcrumbItem>
-                      {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                      {index < breadcrumbs.length - 1 && <BreadcrumbSeparator className="text-muted-foreground/50" />}
                     </React.Fragment>
                   ))
                 )}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <ThemeToggle />
           </div>
         </header>
