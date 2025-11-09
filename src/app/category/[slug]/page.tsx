@@ -147,8 +147,14 @@ function ApiEndpointComponent({ endpoint }: { endpoint: ApiEndpoint }) {
         <div className="flex items-center gap-2 sm:gap-4 w-full">
             <Badge className={`w-16 sm:w-20 justify-center text-xs sm:text-sm ${getMethodClass(endpoint.methods[0])}`}>{endpoint.methods[0]}</Badge>
             <div className='text-left flex-1 min-w-0'>
-                <p className="font-mono text-xs sm:text-sm truncate">{endpoint.path}</p>
-                <p className="text-xs text-muted-foreground font-normal truncate">{endpoint.name}</p>
+                {/* Allow horizontal scroll for very long paths instead of truncating */}
+                <div className="overflow-x-auto max-w-full">
+                  <p className="font-mono text-xs sm:text-sm whitespace-nowrap">{endpoint.path}</p>
+                </div>
+                {/* Endpoint name: keep in one line and allow scrolling on overflow */}
+                <div className="overflow-x-auto max-w-full">
+                  <p className="text-xs text-muted-foreground font-normal whitespace-nowrap">{endpoint.name}</p>
+                </div>
             </div>
             <Badge variant={endpoint.status === 'online' ? 'secondary' : 'destructive'} className='ml-auto flex-shrink-0'>
                 {endpoint.status === 'online' ? 'Ready' : 'Offline'}
