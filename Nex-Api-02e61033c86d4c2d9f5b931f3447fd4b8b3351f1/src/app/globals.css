@@ -78,66 +78,6 @@
   }
 }
 
-/* Responsive & overflow helpers: prevent long text/content from widening the UI
-   - Use the utility class `prevent-expand` on containers with long text
-   - Use `scrollable-text` for blocks where you want a vertical scrollbar
-   - Global rules for images/code/pre to stay within viewport */
-@layer base {
-  /* Prevent horizontal page scrolling caused by overflowing children */
-  html, body, #__next {
-    overflow-x: hidden;
-  }
-
-  /* Generic break/wrap rules for textual content */
-  .prevent-expand,
-  p,
-  li,
-  span,
-  code,
-  pre {
-    /* allow breaking anywhere to avoid overflowing the viewport */
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    /* preserve line breaks but allow wrapping */
-    white-space: pre-wrap;
-    /* Never exceed the parent's width */
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Make images and media fit their containers */
-  img, video, iframe {
-    max-width: 100%;
-    height: auto;
-    display: block;
-  }
-
-  /* Scrollable text block: add this class where you want vertical scrolling
-     instead of letting the text expand the UI. The max-height can be
-     adjusted per-component (inline style or additional utility classes). */
-  .scrollable-text {
-    max-height: 40vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
-    padding-right: 0.25rem; /* small room for scrollbar */
-  }
-
-  /* Small-screen adjustments (roughly for very narrow phones ~300px) */
-  @media (max-width: 360px) {
-    /* reduce container padding so layout can fit 300px width viewports */
-    .container {
-      padding-left: 0.75rem;
-      padding-right: 0.75rem;
-    }
-
-    /* slightly reduce base font-size on very small screens to avoid overflow */
-    html {
-      font-size: 14px;
-    }
-  }
-}
-
 @layer utilities {
   @keyframes blink-caret {
     from, to { border-color: transparent }
