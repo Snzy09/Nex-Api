@@ -32,9 +32,18 @@ export const CodeBlock = ({ text }: { text: string }) => {
 
     return (
         <div className="relative font-mono text-sm bg-background rounded-md border overflow-hidden">
-            <SyntaxHighlighter language={language} style={currentTheme} customStyle={{ margin: 0, padding: '1rem', paddingRight: '3rem', backgroundColor: 'transparent' }} codeTagProps={{ style: { whiteSpace: 'pre-wrap' }}}>
-                {formattedText}
-            </SyntaxHighlighter>
+            {/* Horizontal scroll wrapper: allows long lines to be scrolled horizontally on small devices */}
+            <div className="w-full max-w-full overflow-x-auto overflow-y-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <SyntaxHighlighter
+                    language={language}
+                    style={currentTheme}
+                    customStyle={{ margin: 0, padding: '1rem', paddingRight: '3rem', backgroundColor: 'transparent' }}
+                    // preserve whitespace to allow horizontal scrolling for long lines
+                    codeTagProps={{ style: { whiteSpace: 'pre' } }}
+                >
+                    {formattedText}
+                </SyntaxHighlighter>
+            </div>
             <Button
                 variant="ghost"
                 size="icon"
