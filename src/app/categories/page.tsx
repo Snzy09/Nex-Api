@@ -19,7 +19,6 @@ const categoryIcons: { [key: string]: React.ElementType } = {
     random: ImageIcon,
     news: Newspaper,
     anime: Film,
-    manga: BookOpen,
 };
 
 export default function DashboardPage() {
