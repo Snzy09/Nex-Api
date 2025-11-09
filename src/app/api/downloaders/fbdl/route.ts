@@ -10,8 +10,10 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}))
     const url = (body.url || new URL(req.url).searchParams.get('url') || '').trim()
 
-    if (!/facebook\.|facebook\w*\/.+/(reel|watch|share)|facebook\./i.test(url) && !/facebook\.(com|watch)/i.test(url)) {
-      // Validate loosely: ensure facebook in url
+    // Validate: must contain a facebook domain and a video-like path segment
+    const hasFacebookDomain = /facebook\.(com|net|co|me|watch|[a-z]{2,3})/i.test(url)
+    const hasVideoPath = /\/(?:reel|watch|share|videos?|video)\b/i.test(url)
+    if (!url || !hasFacebookDomain || !hasVideoPath) {
       return NextResponse.json({ error: true, message: 'Invalid URL, masukkan URL video Facebook yang valid.' }, { status: 400 })
     }
 
@@ -67,7 +69,7 @@ export async function POST(req: Request) {
       .find('.tab__content')
       .eq(0)
       .find('tr')
-      .each((_, el) => {
+      .each((_: any, el: any) => {
         const quality = cheerio(el).find('.video-quality').text().trim() || ''
         const urlVal = cheerio(el).find('a').attr('href') || cheerio(el).find('button').attr('data-videourl') || null
         if (urlVal && urlVal !== '#note_convert') {
