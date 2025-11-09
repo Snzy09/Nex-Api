@@ -53,6 +53,7 @@ export const siteConfig = {
               description: 'The search query.',
               required: true,
             },
+            
           ],
         },
         {
@@ -249,6 +250,17 @@ export const siteConfig = {
             { name: 'customTone', type: 'string', description: "Custom tone if module is 'TONE' and 'to' is 'Other'.", required: false },
           ],
         },
+                {
+                    name: 'Code Analyzer',
+                    path: '/api/ai/code-analyzer',
+                    description: 'Analyze source code or raw code URL using CodeDetector API.',
+                    methods: ['POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'code', type: 'string', description: 'Source code to analyze.', required: false },
+                        { name: 'url', type: 'string', description: 'Raw URL pointing to code (must be raw content).', required: false },
+                    ],
+                },
       ],
     },
     /* Manga category removed */
@@ -602,6 +614,27 @@ export const siteConfig = {
                     },
                 ],
             },
+            {
+                name: 'Facebook Downloader (FBDL)',
+                path: '/api/downloaders/fbdl',
+                description: 'Download Facebook videos via fdownloader extraction (provide facebook video/reel/watch/share URL).',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'url', type: 'string', description: 'The Facebook video URL.', required: true },
+                ],
+            },
+            {
+                name: 'Terabox Downloader',
+                path: '/api/downloaders/terabox',
+                description: 'Fetch Terabox download links via teradownloadr proxy.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'link', type: 'string', description: 'The Terabox share link to fetch.', required: true },
+                    { name: 'parse_result', type: 'boolean', description: 'Return a parsed object (true/false).', required: false },
+                ],
+            },
         ],
     },
     tools: {
@@ -628,6 +661,19 @@ export const siteConfig = {
                         required: true,
                         options: ['2', '4'],
                     },
+                ],
+            },
+            {
+                name: 'AkunLama Mail Helper',
+                path: '/api/tools/akunlama',
+                description: 'Check AkunLama disposable mail availability and fetch inbox/html.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'action', type: 'string', description: 'Action to perform: cekEmail|inbox|getInbox', required: true },
+                    { name: 'recipient', type: 'string', description: 'Recipient name for cekEmail/inbox.', required: false },
+                    { name: 'region', type: 'string', description: 'Region for getInbox.', required: false },
+                    { name: 'key', type: 'string', description: 'Key for getInbox.', required: false },
                 ],
             },
             {
