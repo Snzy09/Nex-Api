@@ -2,7 +2,7 @@
 import { apiEndpoints } from "@/settings/config";
 import { TypingText } from "./dashboard/typing-text";
 import { InfoCard } from "./dashboard/info-card";
-import { Database, List, Cpu, Memory, Wifi, Activity, Zap, Clock } from "lucide-react";
+import { Database, List, Cpu, Server, Wifi, Activity, Zap, Clock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
     LineChart,
@@ -104,7 +104,7 @@ export function Dashboard() {
                 />
                 <InfoCard
                     title="Memory Usage"
-                    icon={Memory}
+                    icon={Server}
                     content={<div className="text-2xl font-bold">{current ? `${current.memoryUsage.toFixed(1)}%` : '—'}</div>}
                 />
                 <InfoCard
