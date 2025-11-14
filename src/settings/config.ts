@@ -261,6 +261,16 @@ export const siteConfig = {
                         { name: 'url', type: 'string', description: 'Raw URL pointing to code (must be raw content).', required: false },
                     ],
                 },
+                {
+                    name: 'UnliAI',
+                    path: '/api/ai/unliai',
+                    description: 'Chat with Unlimited AI.',
+                    methods: ['POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'question', type: 'string', description: 'Your question for UnliAI.', required: true },
+                    ],
+                },
       ],
     },
     /* Manga category removed */
