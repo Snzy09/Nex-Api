@@ -250,6 +250,17 @@ export const siteConfig = {
             { name: 'customTone', type: 'string', description: "Custom tone if module is 'TONE' and 'to' is 'Other'.", required: false },
           ],
         },
+        {
+          name: 'Humanize',
+          path: '/api/ai/humanize',
+          description: 'Humanize AI-generated text to appear more natural.',
+          methods: ['GET', 'POST'],
+          status: 'online',
+          parameters: [
+            { name: 'text', type: 'string', description: 'Text to humanize.', required: true },
+            { name: 'level', type: 'select', description: 'Humanization level (standard, enhanced, or aggressive).', required: false, options: ['standard', 'enhanced', 'aggressive'] },
+          ],
+        },
       ],
     },
     /* Manga category removed */
