@@ -307,6 +307,16 @@ export const siteConfig = {
                 status: 'online',
                 parameters: [],
             },
+            {
+                name: 'Dongeng',
+                path: '/api/news/dongeng',
+                description: 'Scrape story data from 1000dongeng.com.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'url', type: 'string', description: 'The story URL from 1000dongeng.com.', required: true },
+                ],
+            },
         ],
     },
     resep: {
