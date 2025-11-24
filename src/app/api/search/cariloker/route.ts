@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { siteConfig } from '@/settings/config';
 
 async function cariLoker(pekerjaan: string, kota: string, jumlah: number = 10) {
@@ -31,7 +31,7 @@ async function cariLoker(pekerjaan: string, kota: string, jumlah: number = 10) {
     const judul = job.title || '-';
     const perusahaan = job.companyName || '-';
     const lokasi = job.locations?.[0]?.label || '-';
-    const tanggal = job.listingDate ? dayjs(job.listingDate).format('DD MMM YYYY') : '-';
+    const tanggal = job.listingDate ? format(new Date(job.listingDate), 'dd MMM yyyy') : '-';
     const gaji = job.salaryLabel || '❌ Tidak dicantumkan';
     const deskripsi = job.teaser || '-';
     const logo = job.branding?.serpLogoUrl || '-';
