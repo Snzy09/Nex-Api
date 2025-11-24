@@ -17,6 +17,16 @@ export const siteConfig = {
   export type ApiEndpoint = {
     name: string;
     path: string;
+            {
+                name: 'Kodepos Search',
+                path: '/api/search/kodepos',
+                description: 'Search Indonesian postal code (kode pos) using nomor.net scraping.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'query', type: 'string', description: 'Location to search (e.g., "canggu bali").', required: true },
+                ],
+            },
     description: string;
     methods: ('GET' | 'POST')[];
     status: 'online' | 'offline';
