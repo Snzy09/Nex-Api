@@ -448,7 +448,7 @@ export const siteConfig = {
                 status: 'online',
                 parameters: [
                     { name: 'target', type: 'string', description: 'Target domain to scan for subdomains (e.g., "example.com").', required: true },
-                ],
+                ],            },
                 {
                 name: 'Google Search',
                 path: '/api/search/google-search',
@@ -458,7 +458,6 @@ export const siteConfig = {
                 parameters: [
                     { name: 'query', type: 'string', description: 'The search query.', required: true },
                 ],
-            },
             },
             {
                 name: 'Info Club',
