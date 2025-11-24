@@ -261,9 +261,19 @@ export const siteConfig = {
             { name: 'level', type: 'select', description: 'Humanization level (standard, enhanced, or aggressive).', required: false, options: ['standard', 'enhanced', 'aggressive'] },
           ],
         },
+        {
+          name: 'Claila AI',
+          path: '/api/ai/claila',
+          description: 'Chat with multiple AI models using Claila API.',
+          methods: ['GET', 'POST'],
+          status: 'online',
+          parameters: [
+            { name: 'message', type: 'string', description: 'The message to send to the AI model.', required: true },
+            { name: 'model', type: 'select', description: 'The AI model to use.', required: false, options: ['chatgpt41mini', 'chatgpt', 'chatgpto1p', 'claude', 'gemini', 'mistral', 'grok'] },
+          ],
+        },
       ],
     },
-    /* Manga category removed */
     anime: {
         name: 'Anime',
         description: 'Endpoints for fetching anime-related data.',
