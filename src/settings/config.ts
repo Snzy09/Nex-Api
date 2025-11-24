@@ -741,6 +741,16 @@ export const siteConfig = {
                 ],
             },
             {
+                name: 'Brat Image',
+                path: '/api/tools/brat',
+                description: 'Generate a Brat-style image from text using API-Faa.brathd.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'text', type: 'string', description: 'The text to convert into a Brat image.', required: true },
+                ],
+            },
+            {
                 name: 'YouTube Summarizer',
                 path: '/api/tools/ytsummarizer',
                 description: 'Summarize a YouTube video from its URL.',
