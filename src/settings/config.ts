@@ -479,21 +479,6 @@ export const siteConfig = {
                         required: true,
                     },
                 ],
-            },
-            {
-                name: 'Kode Pos',
-                path: '/api/search/kodepos',
-                description: 'Search for Indonesian postal codes.',
-                methods: ['GET', 'POST'],
-                status: 'online',
-                parameters: [
-                    {
-                        name: 'query',
-                        type: 'string',
-                        description: 'The location name to search for.',
-                        required: true,
-                    },
-                ],
             }
         ],
     },
@@ -818,8 +803,18 @@ export const siteConfig = {
                     { name: 'dnsType', type: 'string', description: 'DNS record type (required for dns, e.g., A, MX, NS).', required: false },
                 ],
             },
-        ],
-    },
+                {
+                    name: 'Brat Anime',
+                    path: '/api/tools/brat-anime',
+                    description: 'Generate Brat-style anime images from text.',
+                    methods: ['GET', 'POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'text', type: 'string', description: 'The text to create Brat anime for.', required: true },
+                    ],
+                },
+            ],
+        },
     stalk: {
         name: 'Stalk',
         description: 'Endpoints for stalking social media profiles.',
