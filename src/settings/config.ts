@@ -794,6 +794,19 @@ export const siteConfig = {
                     },
                 ],
             },
+            {
+                name: 'CheckHost',
+                path: '/api/tools/checkhost',
+                description: 'Check host status and get IP information using CheckHost API.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'host', type: 'string', description: 'Target host, domain, or IP address to check.', required: true },
+                    { name: 'type', type: 'select', description: 'Check type (ping, http, tcp, udp, dns, info).', required: false, options: ['ping', 'http', 'tcp', 'udp', 'dns', 'info'] },
+                    { name: 'port', type: 'number', description: 'Port number (required for tcp/udp).', required: false },
+                    { name: 'dnsType', type: 'string', description: 'DNS record type (required for dns, e.g., A, MX, NS).', required: false },
+                ],
+            },
         ],
     },
     stalk: {
