@@ -261,6 +261,16 @@ export const siteConfig = {
             { name: 'level', type: 'select', description: 'Humanization level (standard, enhanced, or aggressive).', required: false, options: ['standard', 'enhanced', 'aggressive'] },
           ],
         },
+        {
+          name: 'Meta AI',
+          path: '/api/ai/metaai',
+          description: 'Chat with Meta AI (powered by Llama).',
+          methods: ['GET', 'POST'],
+          status: 'online',
+          parameters: [
+            { name: 'message', type: 'string', description: 'The message to send to Meta AI.', required: true },
+          ],
+        },
 
       ],
     },
