@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
 
-async function cariKodePos(namaDaerah: string, useProxy: boolean = false) {
+async function cariKodePos(namaDaerah: string, useProxy: boolean = true) {
   if (!namaDaerah) throw new Error('Nama daerah (query) is required');
 
   const targetUrl = 'https://www.nomor.net/_kodepos.php?_i=cari-kodepos&jobs=' + encodeURIComponent(namaDaerah);
