@@ -700,6 +700,17 @@ export const siteConfig = {
                 ],
             },
             {
+                name: 'Img Upscaler 2',
+                path: '/api/tools/imgupscaler2',
+                description: 'Upscale an image (Pixelcut API) — accepts base64 or imageUrl.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'image', type: 'string', description: 'Base64 image data (data URL or raw base64).', required: false },
+                    { name: 'imageUrl', type: 'string', description: 'Remote image URL to fetch and upscale.', required: false },
+                ],
+            },
+            {
                 name: 'AkunLama Mail Helper',
                 path: '/api/tools/akunlama',
                 description: 'Check AkunLama disposable mail availability and fetch inbox/html.',
