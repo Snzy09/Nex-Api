@@ -428,6 +428,18 @@ export const siteConfig = {
                 ],
             },
             {
+                name: 'Cari Loker',
+                path: '/api/search/cariloker',
+                description: 'Search for job listings using Seek jobsearch API.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'pekerjaan', type: 'string', description: 'Job title or keywords.', required: true },
+                    { name: 'kota', type: 'string', description: 'City/location to search in.', required: true },
+                    { name: 'jumlah', type: 'number', description: 'Number of results to return (default 10).', required: false },
+                ],
+            },
+            {
                 name: 'Info Club',
                 path: '/api/search/club-info',
                 description: 'Get information about a specific football club.',
