@@ -671,6 +671,28 @@ export const siteConfig = {
                     { name: 'parse_result', type: 'boolean', description: 'Return a parsed object (true/false).', required: false },
                 ],
             },
+            {
+                name: 'YT Download',
+                path: '/api/downloaders/ytdownload',
+                description: 'Download audio/video from YouTube via fast.dlsrv.online gateway.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'videoId', type: 'string', description: 'YouTube video id (e.g., dQw4w9WgXcQ).', required: true },
+                    { name: 'format', type: 'string', description: 'Format/quality (e.g., 128kbps or 720p).', required: false },
+                ],
+            },
+            {
+                name: 'YT Search',
+                path: '/api/downloaders/ytsearch',
+                description: 'Search YouTube and return video ids and titles (basic scraping).',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'query', type: 'string', description: 'Search query.', required: true },
+                    { name: 'limit', type: 'number', description: 'Number of results to return (default 8).', required: false },
+                ],
+            },
         ],
     },
     tools: {
