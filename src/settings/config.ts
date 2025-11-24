@@ -430,6 +430,16 @@ export const siteConfig = {
                 ],
             },
             {
+                name: 'Subfinder',
+                path: '/api/search/subfinder',
+                description: 'Find subdomains of a target domain using PentestTools API.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'target', type: 'string', description: 'Target domain to scan for subdomains (e.g., "example.com").', required: true },
+                ],
+            },
+            {
                 name: 'Info Club',
                 path: '/api/search/club-info',
                 description: 'Get information about a specific football club.',
