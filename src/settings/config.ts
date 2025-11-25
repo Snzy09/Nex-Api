@@ -360,28 +360,7 @@ export const siteConfig = {
                         }
                     ]
                 },
-                'ui-design': {
-                    name: 'UI Design',
-                    description: 'UI and documentation endpoints surfaced for UI design and testing.',
-                    endpoints: [
-                        {
-                            name: 'Docs (Swagger UI)',
-                            path: '/api/docs',
-                            description: 'Interactive API docs (Swagger UI).',
-                            methods: ['GET'],
-                            status: 'online',
-                            parameters: []
-                        },
-                        {
-                            name: 'OpenAPI Spec',
-                            path: '/api/openapi',
-                            description: 'Machine-readable OpenAPI spec.',
-                            methods: ['GET'],
-                            status: 'online',
-                            parameters: []
-                        }
-                    ]
-                },
+                
         anime: {
         name: 'Anime',
         description: 'Endpoints for fetching anime-related data.',
