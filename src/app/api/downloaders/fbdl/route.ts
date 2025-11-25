@@ -1,5 +1,5 @@
 import axios from 'axios'
-import cheerio from 'cheerio'
+import { load } from 'cheerio'
 import { NextResponse } from 'next/server'
 
 const USER_AGENT =
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: true, message: 'Gagal melakukan pencarian video melalui AJAX.' }, { status: 500 })
     }
 
-    const $ = cheerio.load(data.data)
+    const $ = load(data.data)
 
     const title = $('.thumbnail > .content > .clearfix > h3').text().trim() || ''
     const duration = $('.thumbnail > .content > .clearfix > p').text().trim() || ''
@@ -70,8 +70,8 @@ export async function POST(req: Request) {
       .eq(0)
       .find('tr')
       .each((_: any, el: any) => {
-        const quality = cheerio(el).find('.video-quality').text().trim() || ''
-        const urlVal = cheerio(el).find('a').attr('href') || cheerio(el).find('button').attr('data-videourl') || null
+        const quality = $(el).find('.video-quality').text().trim() || ''
+        const urlVal = $(el).find('a').attr('href') || $(el).find('button').attr('data-videourl') || null
         if (urlVal && urlVal !== '#note_convert') {
           videoList.push({ quality, url: urlVal })
         }

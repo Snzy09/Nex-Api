@@ -66,10 +66,10 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ThemeToggle } from './theme-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { apiEndpoints } from '@/settings/config';
 import { usePathname } from 'next/navigation';
-import { HexagonBackground } from './ui/hexagon-background';
+import { HexagonBackground } from '@/components/ui/hexagon-background';
 
 const DATA = {
   user: {

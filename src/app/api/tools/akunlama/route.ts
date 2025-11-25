@@ -1,5 +1,5 @@
 import axios from 'axios'
-import cheerio from 'cheerio'
+import { load } from 'cheerio'
 import { NextResponse } from 'next/server'
 
 export async function GET(req: Request) {
@@ -53,11 +53,11 @@ export async function GET(req: Request) {
       const html = response.data
       if (!html || typeof html !== 'string') return NextResponse.json({ plainText: '', links: [] })
 
-      const $ = cheerio.load(html)
+      const $ = load(html)
       $('script, style').remove()
       const plainText = $('body').text().replace(/\s+/g, ' ').trim()
       const links: Array<{ href: string; text: string }> = []
-      $('a').each((i, el) => {
+      $('a').each((i: any, el: any) => {
         const href = $(el).attr('href')
         if (href) links.push({ href, text: $(el).text().trim() })
       })

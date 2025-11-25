@@ -24,8 +24,8 @@ class Util {
             const encryptedText = Buffer.from(strToDecrypt, 'base64');
 
             const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-            let decrypted = decipher.update(encryptedText, 'utf8');
-            decrypted += decipher.final('utf8');
+            const decryptedBuffers = [decipher.update(encryptedText), decipher.final()];
+            const decrypted = Buffer.concat(decryptedBuffers).toString('utf8');
 
             return decrypted.replace(/\n/g, '');
         } catch (error: any) {

@@ -38,7 +38,7 @@ const cuaca = {
         "use strict";
         this.validasiString(`lokasi`, lokasiKamu);
         const new_url = new URL(`https://www.google.com/s`);
-        new_url.search = new URLSearchParams({
+        new_url.search = '?' + new URLSearchParams({
             "tbm": "map",
             "gs_ri": "maps",
             "suggest": "p",
@@ -87,10 +87,10 @@ const cuaca = {
         const padEnd = 0;
         const namaTempat = placeName.trim().length ? "📌 nama: ".padEnd(padEnd) + placeName + '\n' : '';
         const cuacaApi = new URL(this.url.api_cuaca);
-        cuacaApi.search = new URLSearchParams({ lon: longitude.toString(), lat: latitude.toString() });
+        cuacaApi.search = '?' + new URLSearchParams({ lon: longitude.toString(), lat: latitude.toString() }).toString();
 
         const cuacaWarningApi = new URL(this.url.api_cuaca_warning);
-        cuacaWarningApi.search = new URLSearchParams({ lat: latitude.toString(), long: longitude.toString() });
+        cuacaWarningApi.search = '?' + new URLSearchParams({ lat: latitude.toString(), long: longitude.toString() }).toString();
         const cuacaWarningHeaders = { 'X-api-key': this.string.bmkg, ...this.baseHeaders };
 
         const allRequest = [

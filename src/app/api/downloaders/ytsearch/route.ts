@@ -11,7 +11,7 @@ async function searchYouTube(query: string, limit = 8) {
   const html = await res.text();
 
   // Try to find initial data JSON
-  const initialDataMatch = html.match(/var ytInitialData = (\{.*?\});/s) || html.match(/window\["ytInitialData"\] = (\{.*?\});/s);
+  const initialDataMatch = html.match(/var ytInitialData = (\{[\s\S]*?\});/) || html.match(/window\["ytInitialData"\] = (\{[\s\S]*?\});/);
   let items: any[] = [];
 
   if (initialDataMatch) {
@@ -19,7 +19,7 @@ async function searchYouTube(query: string, limit = 8) {
       const json = JSON.parse(initialDataMatch[1]);
       const contents = json?.contents || json?.contents?.twoColumnSearchResultsRenderer?.primaryContents;
       // fallback deep walk to find videoRenderer nodes
-      const renderers = JSON.stringify(json).match(/"videoRenderer":\{.*?\}\}/gs) || [];
+      const renderers = JSON.stringify(json).match(/"videoRenderer":\{[\s\S]*?\}\}/g) || [];
       for (const r of renderers.slice(0, limit)) {
         const idMatch = r.match(/"videoId":"([^"]+)"/);
         const titleMatch = r.match(/"title":\{\"runs\":\[\{\"text\":\"([^\"]+)\"/);

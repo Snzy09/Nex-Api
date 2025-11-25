@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import cheerio from 'cheerio';
+import { load } from 'cheerio';
 import FormData from 'form-data';
 import { siteConfig } from '@/settings/config';
 
@@ -26,13 +26,13 @@ async function tiktokV2(query: string) {
     throw new Error('Could not retrieve data. The video may be private or the URL is incorrect.');
   }
   
-  const $ = cheerio.load(rawHtml);
+  const $ = load(rawHtml);
   const title = $('.thumbnail .content h3').text().trim();
   const thumbnail = $('.thumbnail .image-tik img').attr('src');
   const video_url = $('video#vid').attr('data-src');
 
   const slide_images: string[] = [];
-  $('.photo-list .download-box li').each((_, el) => {
+  $('.photo-list .download-box li').each((_: any, el: any) => {
     const imgSrc = $(el).find('.download-items__thumb img').attr('src');
     if (imgSrc) slide_images.push(imgSrc);
   });

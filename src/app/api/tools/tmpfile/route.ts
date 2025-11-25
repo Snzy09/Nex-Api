@@ -44,10 +44,10 @@ export async function POST(req: Request) {
     })
 
     const html2 = await r2.text()
-    const filename = html2.match(/Filename(?:.+?)<td>(.+?)<\/td>/s)?.[1] || null
-    const size = html2.match(/Size(?:.+?)<td>(.+?)<\/td>/s)?.[1] || null
-    const url = html2.match(/URL(?:.+?)href="(.+?)"/s)?.[1] || null
-    const expiresAt = html2.match(/Expires at(?:.+?)<td>(.+?)<\/td>/s)?.[1] || null
+    const filename = html2.match(/Filename(?:[\s\S]+?)<td>(.+?)<\/td>/)?.[1] || null
+    const size = html2.match(/Size(?:[\s\S]+?)<td>(.+?)<\/td>/)?.[1] || null
+    const url = html2.match(/URL(?:[\s\S]+?)href="(.+?)"/)?.[1] || null
+    const expiresAt = html2.match(/Expires at(?:[\s\S]+?)<td>(.+?)<\/td>/)?.[1] || null
 
     if (!url) return NextResponse.json({ status: false, message: 'gagal mendapatkan url download', html: html2 }, { status: 500 })
 

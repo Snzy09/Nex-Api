@@ -59,7 +59,7 @@ const sfile = {
       const initialResponse = await sfile.makeRequest(url, { headers });
 
       const cookies = sfile.extractCookies(initialResponse.headers);
-      headers['Cookie'] = cookies;
+      (headers as any)['Cookie'] = cookies;
 
       let $ = cheerio.load(initialResponse.data);
       const metadata = sfile.extractMetadata($);
@@ -67,7 +67,7 @@ const sfile = {
       const downloadUrl = $("#download").attr("href");
       if (!downloadUrl) throw new Error("Download URL not found");
 
-      headers['Referer'] = downloadUrl;
+      (headers as any)['Referer'] = downloadUrl;
       const processResponse = await sfile.makeRequest(downloadUrl, { headers });
 
       const html = processResponse.data;
