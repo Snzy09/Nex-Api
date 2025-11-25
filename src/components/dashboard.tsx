@@ -38,14 +38,23 @@ function useServerMetrics(pollInterval = 3000) {
                 if (!res.ok) return;
                 const json = await res.json();
                 // expect server to return MetricSample-shaped object
+                // Normalize server response: some endpoints return a flat shape
+                // while others return { system: { ... } }. Provide numeric defaults
+                const cpu = Number(json.cpuUsage ?? json.system?.cpuUsage ?? 0);
+                const memory = Number(json.memoryUsage ?? json.system?.memoryUsage ?? 0);
+                const ramUsed = Number(json.ramUsedMB ?? json.system?.ramUsedMB ?? 0);
+                const down = Number(json.bandwidthDownKB ?? json.system?.bandwidthDownKB ?? 0);
+                const up = Number(json.bandwidthUpKB ?? json.system?.bandwidthUpKB ?? 0);
+                const ping = Number(json.pingMs ?? json.system?.pingMs ?? 0);
+
                 const sample: MetricSample = {
-                    timestamp: json.timestamp || Date.now(),
-                    cpuUsage: json.cpuUsage,
-                    memoryUsage: json.memoryUsage,
-                    ramUsedMB: json.ramUsedMB,
-                    bandwidthDownKB: json.bandwidthDownKB,
-                    bandwidthUpKB: json.bandwidthUpKB,
-                    pingMs: json.pingMs,
+                    timestamp: Number(json.timestamp ?? Date.now()),
+                    cpuUsage: Number.isFinite(cpu) ? cpu : 0,
+                    memoryUsage: Number.isFinite(memory) ? memory : 0,
+                    ramUsedMB: Number.isFinite(ramUsed) ? ramUsed : 0,
+                    bandwidthDownKB: Number.isFinite(down) ? down : 0,
+                    bandwidthUpKB: Number.isFinite(up) ? up : 0,
+                    pingMs: Number.isFinite(ping) ? ping : 0,
                 };
                 if (!mounted.current) return;
                 setCurrent(sample);
