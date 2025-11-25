@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import fs from 'fs/promises'
 import path from 'path'
-import siteConfig from '@/settings/config'
+import { siteConfig } from '@/settings/config'
 
 class NanoBanana {
   base = 'https://api.supawork.ai'

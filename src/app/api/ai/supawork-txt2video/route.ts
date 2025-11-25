@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
-import siteConfig from '@/settings/config'
+import { siteConfig } from '@/settings/config'
 
 // TokenGenerator and TextToVideo classes (lightweight usage)
 class TokenGenerator {
