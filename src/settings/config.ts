@@ -5,6 +5,29 @@ export const siteConfig = {
     api: {
       creator: "Sanzzy",
     },
+        {
+            name: 'Supawork Txt2Video',
+            path: '/api/ai/supawork-txt2video',
+            description: 'Generate videos from text using Supawork AI.',
+            methods: ['GET', 'POST'],
+            status: 'online',
+            parameters: [
+                { name: 'prompt', type: 'string', description: 'Text prompt for video generation', required: true },
+                { name: 'model', type: 'string', description: 'Model name (optional)', required: false },
+                { name: 'token', type: 'string', description: 'Supawork auth token (optional)', required: false }
+            ]
+        },
+        {
+            name: 'Supawork NanoBanana',
+            path: '/api/ai/nanobanana',
+            description: 'Image-based generation using Supawork NanoBanana flow.',
+            methods: ['GET', 'POST'],
+            status: 'online',
+            parameters: [
+                { name: 'imageUrl', type: 'string', description: 'Remote image URL to use as input', required: true },
+                { name: 'prompt', type: 'string', description: 'Generation prompt for NanoBanana', required: true }
+            ]
+        },
     maintenance: {
       enabled: false,
       apiResponse: {
