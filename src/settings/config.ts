@@ -276,7 +276,53 @@ export const siteConfig = {
 
       ],
     },
-    anime: {
+        monitor: {
+            name: 'Monitor',
+            description: 'Monitoring and operational endpoints.',
+            endpoints: [
+                {
+                    name: 'Status',
+                    path: '/api/status',
+                    description: 'Health and uptime status.',
+                    methods: ['GET'],
+                    status: 'online',
+                    parameters: []
+                },
+                {
+                    name: 'Version',
+                    path: '/api/version',
+                    description: 'Service version and metadata.',
+                    methods: ['GET'],
+                    status: 'online',
+                    parameters: []
+                },
+                {
+                    name: 'OpenAPI Spec',
+                    path: '/api/openapi',
+                    description: 'Machine-readable OpenAPI spec.',
+                    methods: ['GET'],
+                    status: 'online',
+                    parameters: []
+                },
+                {
+                    name: 'Docs (Swagger UI)',
+                    path: '/api/docs',
+                    description: 'Interactive API docs (Swagger UI).',
+                    methods: ['GET'],
+                    status: 'online',
+                    parameters: []
+                },
+                {
+                    name: 'Metrics',
+                    path: '/api/monitor/metrics',
+                    description: 'In-memory metrics for the API.',
+                    methods: ['GET'],
+                    status: 'online',
+                    parameters: []
+                }
+            ]
+        },
+        anime: {
         name: 'Anime',
         description: 'Endpoints for fetching anime-related data.',
         endpoints: [
