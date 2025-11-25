@@ -875,6 +875,17 @@ export const siteConfig = {
                         { name: 'text', type: 'string', description: 'The text to create Brat anime for.', required: true },
                     ],
                 },
+                {
+                    name: 'Tmpfile',
+                    path: '/api/tools/tmpfile',
+                    description: 'Upload a file to tmpfiles.org and return a download URL.',
+                    methods: ['POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'buffer', type: 'string', description: 'Base64 data URL or raw base64 string.', required: true },
+                        { name: 'ext', type: 'string', description: 'File extension (e.g., .png, .jpg). Defaults to .bin', required: false },
+                    ],
+                },
             ],
         },
     stalk: {
