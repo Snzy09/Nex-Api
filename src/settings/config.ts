@@ -322,6 +322,66 @@ export const siteConfig = {
                 }
             ]
         },
+                system: {
+                    name: 'System',
+                    description: 'System-level endpoints (health, version, docs).',
+                    endpoints: [
+                        {
+                            name: 'Status',
+                            path: '/api/status',
+                            description: 'Health and uptime status.',
+                            methods: ['GET'],
+                            status: 'online',
+                            parameters: []
+                        },
+                        {
+                            name: 'Version',
+                            path: '/api/version',
+                            description: 'Service version and metadata.',
+                            methods: ['GET'],
+                            status: 'online',
+                            parameters: []
+                        },
+                        {
+                            name: 'OpenAPI Spec',
+                            path: '/api/openapi',
+                            description: 'Machine-readable OpenAPI spec.',
+                            methods: ['GET'],
+                            status: 'online',
+                            parameters: []
+                        },
+                        {
+                            name: 'Docs (Swagger UI)',
+                            path: '/api/docs',
+                            description: 'Interactive API docs (Swagger UI).',
+                            methods: ['GET'],
+                            status: 'online',
+                            parameters: []
+                        }
+                    ]
+                },
+                'ui-design': {
+                    name: 'UI Design',
+                    description: 'UI and documentation endpoints surfaced for UI design and testing.',
+                    endpoints: [
+                        {
+                            name: 'Docs (Swagger UI)',
+                            path: '/api/docs',
+                            description: 'Interactive API docs (Swagger UI).',
+                            methods: ['GET'],
+                            status: 'online',
+                            parameters: []
+                        },
+                        {
+                            name: 'OpenAPI Spec',
+                            path: '/api/openapi',
+                            description: 'Machine-readable OpenAPI spec.',
+                            methods: ['GET'],
+                            status: 'online',
+                            parameters: []
+                        }
+                    ]
+                },
         anime: {
         name: 'Anime',
         description: 'Endpoints for fetching anime-related data.',
