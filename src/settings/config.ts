@@ -134,6 +134,17 @@ export const siteConfig = {
             },
           ],
         },
+                {
+                    name: 'Unrestricted AI Image',
+                    path: '/api/ai/unrestrictedai',
+                    description: 'Generate images using Unrestricted AI image generator.',
+                    methods: ['GET', 'POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'prompt', type: 'string', description: 'The prompt for image generation.', required: true },
+                        { name: 'style', type: 'select', description: 'Image style to use.', required: false, options: ['photorealistic', 'digital-art', 'impressionist', 'anime', 'fantasy', 'sci-fi', 'vintage'] },
+                    ],
+                },
         {
           name: 'Turbo GPT-3.5',
           path: '/api/ai/turbo-gpt3',
