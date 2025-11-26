@@ -333,62 +333,7 @@ export const siteConfig = {
                     },
                 ],
             },
-                {
-                    name: 'Kurama Detail',
-                    path: '/api/anime/kurama/detail',
-                    description: 'Get anime detail, episodes, tags, and related from Kurama.',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'url', type: 'string', description: 'Full Kurama anime detail URL.', required: true },
-                        { name: 'page', type: 'number', description: 'Episode page index for pagination.', required: false },
-                    ],
-                },
-                {
-                    name: 'Kurama Episode',
-                    path: '/api/anime/kurama/episode',
-                    description: 'Get episode page, video sources and downloads from Kurama.',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'url', type: 'string', description: 'Full Kurama episode URL.', required: true },
-                    ],
-                },
-                {
-                    name: 'Kurama Schedule',
-                    path: '/api/anime/kurama/schedule',
-                    description: 'Get schedule for a weekday from Kurama (english day names).',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'day', type: 'string', description: 'Day name (e.g., sunday).', required: true },
-                        { name: 'page', type: 'number', description: 'Page number', required: false },
-                    ],
-                },
-                {
-                    name: 'Kurama Ongoing',
-                    path: '/api/anime/kurama/ongoing',
-                    description: 'List ongoing animes from Kurama.',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: [ { name: 'page', type: 'number', description: 'Page number', required: false } ],
-                },
-                {
-                    name: 'Kurama Finished',
-                    path: '/api/anime/kurama/finished',
-                    description: 'List finished animes from Kurama.',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: [ { name: 'page', type: 'number', description: 'Page number', required: false } ],
-                },
-                {
-                    name: 'Kurama Movie',
-                    path: '/api/anime/kurama/movie',
-                    description: 'List movie animes from Kurama.',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: [ { name: 'page', type: 'number', description: 'Page number', required: false } ],
-                },
+                
         ],
     },
     news: {
