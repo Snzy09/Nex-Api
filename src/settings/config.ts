@@ -561,6 +561,29 @@ export const siteConfig = {
                     },
                 ],
             }
+            ,
+            {
+                name: 'Lahelu Search',
+                path: '/api/search/lahelu/search',
+                description: 'Search posts on Lahelu by query.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'query', type: 'string', description: 'Search query for Lahelu.', required: true },
+                    { name: 'cursor', type: 'number', description: 'Pagination cursor (default 0).', required: false },
+                ],
+            },
+            {
+                name: 'Lahelu Recommendations',
+                path: '/api/search/lahelu/recommendations',
+                description: 'Get recommended posts from Lahelu (FOR_YOU, FRESH, VIRAL).',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'field', type: 'number', description: 'Field key (5=FOR_YOU,6=FRESH,7=VIRAL).', required: false },
+                    { name: 'cursor', type: 'number', description: 'Pagination cursor (default 0).', required: false },
+                ],
+            }
         ],
     },
     downloaders: {
