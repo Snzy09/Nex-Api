@@ -289,30 +289,6 @@ export const siteConfig = {
                     parameters: []
                 },
                 {
-                    name: 'Version',
-                    path: '/api/version',
-                    description: 'Service version and metadata.',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: []
-                },
-                {
-                    name: 'OpenAPI Spec',
-                    path: '/api/openapi',
-                    description: 'Machine-readable OpenAPI spec.',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: []
-                },
-                {
-                    name: 'Docs (Swagger UI)',
-                    path: '/api/docs',
-                    description: 'Interactive API docs (Swagger UI).',
-                    methods: ['GET'],
-                    status: 'online',
-                    parameters: []
-                },
-                {
                     name: 'Metrics',
                     path: '/api/monitor/metrics',
                     description: 'In-memory metrics for the API.',
@@ -334,30 +310,7 @@ export const siteConfig = {
                             status: 'online',
                             parameters: []
                         },
-                        {
-                            name: 'Version',
-                            path: '/api/version',
-                            description: 'Service version and metadata.',
-                            methods: ['GET'],
-                            status: 'online',
-                            parameters: []
-                        },
-                        {
-                            name: 'OpenAPI Spec',
-                            path: '/api/openapi',
-                            description: 'Machine-readable OpenAPI spec.',
-                            methods: ['GET'],
-                            status: 'online',
-                            parameters: []
-                        },
-                        {
-                            name: 'Docs (Swagger UI)',
-                            path: '/api/docs',
-                            description: 'Interactive API docs (Swagger UI).',
-                            methods: ['GET'],
-                            status: 'online',
-                            parameters: []
-                        }
+                        
                     ]
                 },
                 
