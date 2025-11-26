@@ -12,6 +12,8 @@ export async function GET(req: Request) {
     return NextResponse.json(res)
   } catch (e: any) {
     metrics.recordResponse('/api/anime/kurama/ongoing', Date.now() - start)
-    return NextResponse.json({ error: String(e) }, { status: 500 })
+    const body = (e && (e as any).body) ? (e as any).body : undefined
+    const status = (e && (e as any).status) ? (e as any).status : 500
+    return NextResponse.json({ error: String(e), status, body }, { status })
   }
 }
