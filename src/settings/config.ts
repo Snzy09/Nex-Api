@@ -261,6 +261,17 @@ export const siteConfig = {
             { name: 'customTone', type: 'string', description: "Custom tone if module is 'TONE' and 'to' is 'Other'.", required: false },
           ],
         },
+                {
+                    name: 'AI Copilot 2',
+                    path: '/api/ai/copilot-2',
+                    description: 'Copilot AI (alternate entry) — chat with Copilot via message + model (v2).',
+                    methods: ['GET', 'POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'message', type: 'string', description: 'The message to send to Copilot-2.', required: true },
+                        { name: 'model', type: 'string', description: 'Optional model key (e.g., default, think-deeper, gpt-5).', required: false },
+                    ],
+                },
         {
           name: 'Humanize',
           path: '/api/ai/humanize',
