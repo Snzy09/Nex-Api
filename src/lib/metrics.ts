@@ -1,5 +1,32 @@
 import { apiEndpoints } from '@/settings/config'
 
+let firebaseDb: any = null
+let firebaseAvailable = false
+
+async function initFirebaseIfNeeded() {
+  if (firebaseAvailable || firebaseDb) return
+  try {
+    const { initializeApp } = await import('firebase/app')
+    const { getFirestore } = await import('firebase/firestore')
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID
+    if (!apiKey || !projectId) return
+    const app = initializeApp({
+      apiKey,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || process.env.FIREBASE_AUTH_DOMAIN,
+      projectId,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || process.env.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || process.env.FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || process.env.FIREBASE_APP_ID,
+    })
+    firebaseDb = getFirestore(app)
+    firebaseAvailable = true
+  } catch (e) {
+    // If Firebase isn't configured or import fails, leave firebaseAvailable false
+    firebaseAvailable = false
+  }
+}
+
 type RouteCounts = Record<string, number>
 
 export const metrics = {
@@ -10,6 +37,30 @@ export const metrics = {
   recordRequest(path: string) {
     this.totalRequests++
     this.routes[path] = (this.routes[path] || 0) + 1
+
+    // Also persist increments to Firebase (if available)
+    ;(async () => {
+      try {
+        await initFirebaseIfNeeded()
+        if (!firebaseAvailable || !firebaseDb) return
+        const { doc, updateDoc, setDoc, increment } = await import('firebase/firestore')
+        const countersRef = doc(firebaseDb, 'api_metrics', 'counters')
+        // Try update, if fails (doc missing), set with initial values
+        try {
+          await updateDoc(countersRef, {
+            totalRequests: increment(1),
+            [`routes.${path}`]: increment(1),
+          })
+        } catch (err) {
+          await setDoc(countersRef, {
+            totalRequests: 1,
+            routes: { [path]: 1 },
+          }, { merge: true })
+        }
+      } catch (err) {
+        // ignore Firebase errors to avoid breaking metrics recording
+      }
+    })()
   },
 
   recordResponse(path: string, ms: number) {

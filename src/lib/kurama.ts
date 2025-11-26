@@ -1,27 +1,100 @@
-import axios from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { load } from 'cheerio'
 
 export class Kurama {
   u: string
   targetEnv: string
-  is: any
+  is: AxiosInstance
+  userAgents: string[]
 
   constructor() {
     this.u = 'https://v8.kuramanime.tel'
     this.targetEnv = 'data-kk'
-    this.is = axios.create({
+
+    this.userAgents = [
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15',
+    ]
+
+    const defaultHeaders = {
+      'User-Agent': this.userAgents[0],
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      Connection: 'keep-alive',
+      Origin: this.u,
+      Referer: this.u,
+    }
+
+    const axiosOpts: AxiosRequestConfig = {
       baseURL: this.u,
-      headers: {
-        'user-agent': 'Mozilla/5.0 (Linux; Android 16; NX729J) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.7499.34 Mobile Safari/537.36',
-        origin: this.u,
-        referer: this.u,
-      },
-    })
+      headers: defaultHeaders,
+      timeout: 15_000,
+    }
+
+    // Optional simple proxy support via env var SCRAPE_PROXY (host:port or http(s)://host:port)
+    const proxyRaw = process.env.SCRAPE_PROXY || process.env.KURAMA_PROXY
+    if (proxyRaw) {
+      try {
+        // support http://host:port or host:port
+        const normalized = proxyRaw.replace(/^https?:\/\//, '')
+        const [hostPart, portPart] = normalized.split(':')
+        const port = portPart ? parseInt(portPart, 10) : undefined
+        if (hostPart && port) {
+          ;(axiosOpts as any).proxy = { host: hostPart, port }
+        }
+      } catch (err) {
+        // ignore proxy parse errors; continue without proxy
+      }
+    }
+
+    this.is = axios.create(axiosOpts)
+  }
+
+  private sleep(ms: number) {
+    return new Promise((res) => setTimeout(res, ms))
+  }
+
+  private async requestWithRetry(method: 'get' | 'post', url: string, config?: AxiosRequestConfig, maxRetries = 3) {
+    let attempt = 0
+    const baseDelay = 300
+    while (attempt < maxRetries) {
+      attempt++
+      try {
+        // rotate user-agent per attempt
+        const ua = this.userAgents[Math.floor(Math.random() * this.userAgents.length)]
+        const finalConfig: AxiosRequestConfig = { ...(config || {}), headers: { ...(config?.headers || {}), 'User-Agent': ua } }
+        const res = await this.is.request({ url, method, ...finalConfig })
+        return res
+      } catch (err: any) {
+        const status = err?.response?.status
+        const body = err?.response?.data
+        // If 403 or 429, wait and retry with backoff; otherwise rethrow
+        if (status === 403 || status === 429 || !err?.response) {
+          if (attempt >= maxRetries) {
+            const message = `Request failed after ${attempt} attempts: status=${status} ${err?.message || ''}`
+            const e = new Error(message)
+            ;(e as any).status = status
+            ;(e as any).body = body
+            throw e
+          }
+          const delay = baseDelay * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 100)
+          await this.sleep(delay)
+          continue
+        }
+        // other status codes: throw with response body
+        const e = new Error(err?.message || 'Request error')
+        ;(e as any).status = status
+        ;(e as any).body = body
+        throw e
+      }
+    }
+    throw new Error('unreachable')
   }
 
   async detail(url: string, page = 0) {
     try {
-      const wb = await this.is.get(url, { params: { page } })
+      const wb = await this.requestWithRetry('get', url, { params: { page } })
       const $ = load(wb.data)
 
       const tp: any[] = []
@@ -96,12 +169,12 @@ export class Kurama {
   async ex(a: string, b: any) {
     try {
       const c = load(b.data)(`.row div[${this.targetEnv}]`).attr(this.targetEnv)
-      const d = await this.is.get(`/assets/js/${c}.js`)
+      const d = await this.requestWithRetry('get', `/assets/js/${c}.js`)
       const e = d.data.match(/= ({[\s\S]*?});/)?.[1]
       const j1 = e?.match(/MIX_AUTH_ROUTE_PARAM: '(.*?)',/)?.[1]
       const j2 = e?.match(/MIX_PAGE_TOKEN_KEY: '(.*?)',/)?.[1]
       const j3 = e?.match(/MIX_STREAM_SERVER_KEY: '(.*?)',/)?.[1]
-      const f = await this.is.get(`/assets/${j1}`)
+      const f = await this.requestWithRetry('get', `/assets/${j1}`)
       const param: [string, string][] = [[j2, f.data.trim()], [j3, 'kuramadrive'], ['page', '1']]
       const g = new URL(a)
       param.map((i) => g.searchParams.set(...i))
@@ -113,13 +186,10 @@ export class Kurama {
 
   async episode(url: string) {
     try {
-      const t = await this.is.get(url)
+      const t = await this.requestWithRetry('get', url)
       const k = await this.ex(url, t)
-      const a = await axios.get(k, {
-        headers: {
-          cookie: (t.headers['set-cookie'] || []).map((i: string) => `${i};`).join('')
-        }
-      })
+      const cookieHeader = (t.headers['set-cookie'] || []).map((i: string) => `${i};`).join('')
+      const a = await this.requestWithRetry('get', k, { headers: { cookie: cookieHeader } })
       const $ = load(a.data)
 
       const result: any = {
@@ -164,7 +234,7 @@ export class Kurama {
 
   async schedule(day: string, page = 1) {
     try {
-      const f = await this.is.get('/schedule', { params: { scheduled_day: day, page, need_json: true } }).then((i: any) => i.data)
+      const f = (await this.requestWithRetry('get', '/schedule', { params: { scheduled_day: day, page, need_json: true } })).data
       return {
         animes: f.animes.data.map((p: any) => ({ url: this.u + `/anime/${p.id}/${p.slug}`, ...p })),
         hasNextPage: !!f.animes.next_page_url,
@@ -177,7 +247,7 @@ export class Kurama {
 
   async ongoing(page = 1) {
     try {
-      const f = await this.is.get('/', { params: { page, need_json: true } }).then((i: any) => i.data)
+      const f = (await this.requestWithRetry('get', '/', { params: { page, need_json: true } })).data
       return {
         animes: f.ongoingAnimes.data.map((p: any) => ({ url: this.u + `/anime/${p.id}/${p.slug}`, ...p })),
         hasNextPage: !!f.ongoingAnimes.next_page_url,
@@ -190,7 +260,7 @@ export class Kurama {
 
   async finished(page = 1) {
     try {
-      const f = await this.is.get('/', { params: { page, need_json: true } }).then((i: any) => i.data)
+      const f = (await this.requestWithRetry('get', '/', { params: { page, need_json: true } })).data
       return {
         animes: f.finishedAnimes.data.map((p: any) => ({ url: this.u + `/anime/${p.id}/${p.slug}`, ...p })),
         hasNextPage: !!f.finishedAnimes.next_page_url,
@@ -203,7 +273,7 @@ export class Kurama {
 
   async movie(page = 1) {
     try {
-      const f = await this.is.get('/', { params: { page, need_json: true } }).then((i: any) => i.data)
+      const f = (await this.requestWithRetry('get', '/', { params: { page, need_json: true } })).data
       return {
         animes: f.movieAnimes.data.map((p: any) => ({ url: this.u + `/anime/${p.id}/${p.slug}`, ...p })),
         hasNextPage: !!f.movieAnimes.next_page_url,
