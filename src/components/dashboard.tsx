@@ -90,6 +90,7 @@ export function Dashboard() {
 
     const recentLogs = rawMetrics?.metrics?.recentLogs ?? [];
     const ipCounts = rawMetrics?.metrics?.ipCounts ?? {};
+    const topEndpoints = rawMetrics?.metrics?.topEndpoints ?? [];
 
     return (
         <div className="space-y-8">
@@ -137,6 +138,30 @@ export function Dashboard() {
                             </div>
                         ))}
                     </div>
+                </div>
+            </div>
+
+            <div className="card p-4 bg-card rounded-md">
+                <h3 className="text-sm font-medium mb-2">Top Endpoints</h3>
+                <div className="overflow-auto max-h-64">
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="text-left text-xs text-muted-foreground">
+                                <th className="p-2">Path</th>
+                                <th className="p-2">Requests</th>
+                                <th className="p-2">Avg resp (ms)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {topEndpoints.map((ep: any, idx: number) => (
+                                <tr key={idx} className="border-t">
+                                    <td className="p-2 font-mono truncate">{ep.path}</td>
+                                    <td className="p-2">{ep.requests}</td>
+                                    <td className="p-2">{ep.avgResponseMs ?? 0}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
