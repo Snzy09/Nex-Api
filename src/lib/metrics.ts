@@ -33,6 +33,10 @@ export const metrics = {
   totalRequests: 0 as number,
   routes: {} as RouteCounts,
   responseTimes: {} as Record<string, number[]>,
+  // recent request logs (most recent first)
+  requestLogs: [] as { ts: number; path: string; method: string; ip: string; ua?: string }[],
+  // counts per ip
+  ipCounts: {} as Record<string, number>,
 
   recordRequest(path: string) {
     this.totalRequests++
@@ -59,6 +63,42 @@ export const metrics = {
         }
       } catch (err) {
         // ignore Firebase errors to avoid breaking metrics recording
+      }
+    })()
+  },
+
+  logRequest(info: { path: string; method: string; ip?: string; ua?: string }) {
+    const ts = Date.now()
+    const ip = info.ip || 'unknown'
+    this.requestLogs.unshift({ ts, path: info.path, method: info.method || 'GET', ip, ua: info.ua })
+    // cap logs to last 500 entries
+    if (this.requestLogs.length > 500) this.requestLogs.length = 500
+    this.ipCounts[ip] = (this.ipCounts[ip] || 0) + 1
+
+    // persist to Firebase if possible (best-effort)
+    ;(async () => {
+      try {
+        await initFirebaseIfNeeded()
+        if (!firebaseAvailable || !firebaseDb) return
+        const { collection, addDoc, doc, updateDoc, increment } = await import('firebase/firestore')
+        // store recent log in a dedicated collection
+        try {
+          const col = collection(firebaseDb, 'api_logs')
+          await addDoc(col, { ts, path: info.path, method: info.method || 'GET', ip, ua: info.ua })
+        } catch (e) {
+          // ignore
+        }
+        // update counters doc
+        try {
+          const countersRef = doc(firebaseDb, 'api_metrics', 'counters')
+          await updateDoc(countersRef, {
+            [`ips.${ip}`]: increment(1),
+          })
+        } catch (e) {
+          // ignore
+        }
+      } catch (e) {
+        // ignore firebase errors
       }
     })()
   },
@@ -104,6 +144,9 @@ export const metrics = {
       rawResponseTimes: this.responseTimes,
       categories,
       topEndpoints,
+      // request logs and ip aggregates
+      recentLogs: this.requestLogs.slice(0, 100),
+      ipCounts: this.ipCounts,
       now: new Date().toISOString(),
     }
   },

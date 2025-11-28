@@ -27,6 +27,7 @@ type MetricSample = {
 function useServerMetrics(pollInterval = 3000) {
     const [current, setCurrent] = useState<MetricSample | null>(null);
     const [history, setHistory] = useState<MetricSample[]>([]);
+    const [rawMetrics, setRawMetrics] = useState<any>(null);
     const mounted = useRef(true);
 
     useEffect(() => {
@@ -58,6 +59,7 @@ function useServerMetrics(pollInterval = 3000) {
                 };
                 if (!mounted.current) return;
                 setCurrent(sample);
+                setRawMetrics(json);
                 setHistory((prev) => {
                     const next = [...prev, sample];
                     // keep last 30 samples (~90s if pollInterval=3s)
@@ -76,14 +78,18 @@ function useServerMetrics(pollInterval = 3000) {
         };
     }, [pollInterval]);
 
-    return { current, history };
+    return { current, history, rawMetrics };
 }
+
 
 export function Dashboard() {
     const totalCategories = Object.keys(apiEndpoints).length;
     const totalEndpoints = Object.values(apiEndpoints).reduce((acc, category) => acc + category.endpoints.length, 0);
 
-    const { current, history } = useServerMetrics(3000);
+    const { current, history, rawMetrics } = useServerMetrics(3000 as any);
+
+    const recentLogs = rawMetrics?.metrics?.recentLogs ?? [];
+    const ipCounts = rawMetrics?.metrics?.ipCounts ?? {};
 
     return (
         <div className="space-y-8">
@@ -94,6 +100,45 @@ export function Dashboard() {
                 </div>
             </div>
 
+            <div className="grid gap-4 lg:grid-cols-2">
+                <div className="card p-4 bg-card rounded-md">
+                    <h3 className="text-sm font-medium mb-2">Recent API Requests</h3>
+                    <div className="overflow-auto max-h-64">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="text-left text-xs text-muted-foreground">
+                                    <th className="p-2">Time</th>
+                                    <th className="p-2">Method</th>
+                                    <th className="p-2">Path</th>
+                                    <th className="p-2">IP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {recentLogs.slice(0, 50).map((log: any, idx: number) => (
+                                    <tr key={idx} className="border-t">
+                                        <td className="p-2">{new Date(log.ts).toLocaleTimeString()}</td>
+                                        <td className="p-2 font-mono">{log.method}</td>
+                                        <td className="p-2 font-mono truncate">{log.path}</td>
+                                        <td className="p-2 font-mono">{log.ip}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div className="card p-4 bg-card rounded-md">
+                    <h3 className="text-sm font-medium mb-2">Top Requesters (IPs)</h3>
+                    <div className="space-y-2">
+                        {Object.entries(ipCounts).sort((a: any, b: any) => (b[1] as number) - (a[1] as number)).slice(0, 20).map(([ip, cnt]: any) => (
+                            <div key={ip} className="flex items-center justify-between p-2 border rounded">
+                                <div className="font-mono truncate">{ip}</div>
+                                <div className="text-sm font-semibold">{cnt}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <InfoCard
                     title="Total Categories"
