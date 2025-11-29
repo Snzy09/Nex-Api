@@ -4,7 +4,7 @@ import { TypingText } from "./dashboard/typing-text";
 import { InfoCard } from "./dashboard/info-card";
 import { LogsPanel } from "./dashboard/logs-panel";
 import { Database, List, Cpu, Server, Wifi, Activity, Zap, Clock } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import {
     LineChart,
     Line,
@@ -30,51 +30,43 @@ function useServerMetrics(pollInterval = 3000) {
     const [history, setHistory] = useState<MetricSample[]>([]);
     const [rawMetrics, setRawMetrics] = useState<any>(null);
     const mounted = useRef(true);
+    const fetchMetrics = useCallback(async () => {
+        try {
+            const res = await fetch('/api/monitor/metrics');
+            if (!res.ok) return;
+            const json = await res.json();
+            const cpu = Number(json.cpuUsage ?? json.system?.cpuUsage ?? 0);
+            const memory = Number(json.memoryUsage ?? json.system?.memoryUsage ?? 0);
+            const ramUsed = Number(json.ramUsedMB ?? json.system?.ramUsedMB ?? 0);
+            const down = Number(json.bandwidthDownKB ?? json.system?.bandwidthDownKB ?? 0);
+            const up = Number(json.bandwidthUpKB ?? json.system?.bandwidthUpKB ?? 0);
+            const ping = Number(json.pingMs ?? json.system?.pingMs ?? 0);
+
+            const sample: MetricSample = {
+                timestamp: Number(json.timestamp ?? Date.now()),
+                cpuUsage: Number.isFinite(cpu) ? cpu : 0,
+                memoryUsage: Number.isFinite(memory) ? memory : 0,
+                ramUsedMB: Number.isFinite(ramUsed) ? ramUsed : 0,
+                bandwidthDownKB: Number.isFinite(down) ? down : 0,
+                bandwidthUpKB: Number.isFinite(up) ? up : 0,
+                pingMs: Number.isFinite(ping) ? ping : 0,
+            };
+            if (!mounted.current) return;
+            setCurrent(sample);
+            setRawMetrics(json);
+            setHistory((prev) => {
+                const next = [...prev, sample];
+                return next.slice(-30);
+            });
+        } catch (e) {
+            // silently ignore
+        }
+    }, []);
 
     useEffect(() => {
         mounted.current = true;
-
-        const fetchMetrics = async () => {
-            try {
-                const res = await fetch('/api/monitor/metrics');
-                if (!res.ok) return;
-                const json = await res.json();
-                // expect server to return MetricSample-shaped object
-                // Normalize server response: some endpoints return a flat shape
-                // while others return { system: { ... } }. Provide numeric defaults
-                const cpu = Number(json.cpuUsage ?? json.system?.cpuUsage ?? 0);
-                const memory = Number(json.memoryUsage ?? json.system?.memoryUsage ?? 0);
-                const ramUsed = Number(json.ramUsedMB ?? json.system?.ramUsedMB ?? 0);
-                const down = Number(json.bandwidthDownKB ?? json.system?.bandwidthDownKB ?? 0);
-                const up = Number(json.bandwidthUpKB ?? json.system?.bandwidthUpKB ?? 0);
-                const ping = Number(json.pingMs ?? json.system?.pingMs ?? 0);
-
-                const sample: MetricSample = {
-                    timestamp: Number(json.timestamp ?? Date.now()),
-                    cpuUsage: Number.isFinite(cpu) ? cpu : 0,
-                    memoryUsage: Number.isFinite(memory) ? memory : 0,
-                    ramUsedMB: Number.isFinite(ramUsed) ? ramUsed : 0,
-                    bandwidthDownKB: Number.isFinite(down) ? down : 0,
-                    bandwidthUpKB: Number.isFinite(up) ? up : 0,
-                    pingMs: Number.isFinite(ping) ? ping : 0,
-                };
-                if (!mounted.current) return;
-                setCurrent(sample);
-                setRawMetrics(json);
-                setHistory((prev) => {
-                    const next = [...prev, sample];
-                    // keep last 30 samples (~90s if pollInterval=3s)
-                    return next.slice(-30);
-                });
-            } catch (e) {
-                // silently ignore
-            }
-        };
-
-        // Always fetch once on mount so dashboard panels (top endpoints/IPs) have data
         fetchMetrics();
-        // Only set up interval when pollInterval > 0
-        let id: any = null
+        let id: any = null;
         if (pollInterval && pollInterval > 0) {
             id = setInterval(fetchMetrics, pollInterval);
         }
@@ -82,9 +74,9 @@ function useServerMetrics(pollInterval = 3000) {
             mounted.current = false;
             if (id) clearInterval(id);
         };
-    }, [pollInterval]);
+    }, [pollInterval, fetchMetrics]);
 
-    return { current, history, rawMetrics };
+    return { current, history, rawMetrics, refresh: fetchMetrics };
 }
 
 
@@ -92,8 +84,20 @@ export function Dashboard() {
     const totalCategories = Object.keys(apiEndpoints).length;
     const totalEndpoints = Object.values(apiEndpoints).reduce((acc, category) => acc + category.endpoints.length, 0);
 
-    // pass 0 to disable automatic polling
-    const { current, history, rawMetrics } = useServerMetrics(0 as any);
+    // control polling via UI (disabled by default)
+    const [pollMs, setPollMs] = useState<number>(0);
+    const [pollEnabled, setPollEnabled] = useState<boolean>(false);
+    const { current, history, rawMetrics, refresh } = useServerMetrics(pollMs as any);
+
+    const togglePolling = () => {
+        if (pollEnabled) {
+            setPollEnabled(false);
+            setPollMs(0);
+        } else {
+            setPollEnabled(true);
+            setPollMs(3000);
+        }
+    }
 
     const recentLogs = rawMetrics?.metrics?.recentLogs ?? [];
     const ipCounts = rawMetrics?.metrics?.ipCounts ?? {};
@@ -105,6 +109,16 @@ export function Dashboard() {
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Nex Api 〽️</h1>
                     <TypingText />
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        className={`btn ${pollEnabled ? 'btn-ghost' : ''}`}
+                        onClick={togglePolling}
+                        aria-pressed={pollEnabled}
+                    >
+                        {pollEnabled ? 'Disable Metrics' : 'Enable Metrics'}
+                    </button>
+                    <button className="btn" onClick={() => refresh()}>Refresh</button>
                 </div>
             </div>
 
