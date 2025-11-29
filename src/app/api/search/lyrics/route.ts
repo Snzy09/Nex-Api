@@ -47,6 +47,8 @@ async function handleRequest(req: NextRequest, body?: any) {
     const start = Date.now()
     const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
     const method = req.method
+    // record arrival immediately (non-blocking) to help debug failures
+    try { await appendLog({ method, path: fullPath, status: null, responseTimeMs: null, message: 'arrival' }).catch(()=>{}) } catch (e) {}
     const title = body?.title?.trim() || req.nextUrl.searchParams.get('title')?.trim();
     if (!title) {
         await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing title' }).catch(()=>{})
