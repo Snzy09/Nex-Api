@@ -42,7 +42,7 @@ export const siteConfig = {
       endpoints: [
         {
           name: 'Felo AI Search',
-          path: '/api/ai/felo',
+          path: '/api/search/felo',
           description: 'Get search results from Felo AI.',
           methods: ['GET', 'POST'],
           status: 'online',
@@ -148,11 +148,21 @@ export const siteConfig = {
                 {
                     name: 'Raka AI',
                     path: '/api/ai/raka',
-                    description: 'Chat with Raka AI (reka.ai) — send `text` or `message` in POST body.',
+                    description: 'Chat with Reka AI (reka.ai) — send `text` or `message` in POST body.',
+                    methods: ['POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'text', type: 'string', description: 'The message to send to Reka AI.', required: true },
+                    ],
+                },
+                {
+                    name: 'ChatGPT 4o',
+                    path: '/api/ai/chatgpt4o',
+                    description: 'Chat with ChatGPT 4o via aimlapi proxy (gpt-4o).',
                     methods: ['GET', 'POST'],
                     status: 'online',
                     parameters: [
-                        { name: 'text', type: 'string', description: 'The message to send to Raka AI.', required: true },
+                        { name: 'text', type: 'string', description: 'The message to send to ChatGPT 4o.', required: true },
                     ],
                 },
         {
