@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 const unaiMytext = {
   api: {
@@ -112,11 +113,15 @@ const unaiMytext = {
 };
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const text = (body?.text ?? body?.prompt ?? req.nextUrl.searchParams.get('text') ?? req.nextUrl.searchParams.get('prompt'))?.toString()?.trim();
   const level = (body?.level ?? req.nextUrl.searchParams.get('level') ?? 'enhanced')?.toString()?.toLowerCase();
   const customSettings = body?.settings ?? {};
 
   if (!text) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing text' }).catch(()=>{})
     return NextResponse.json(
       { status: false, creator: siteConfig.api.creator, error: 'Text parameter is required.' },
       { status: 400 }
@@ -125,6 +130,8 @@ async function handleRequest(req: NextRequest, body?: any) {
 
   try {
     const result = await unaiMytext.humanize(text, level, customSettings);
+    const statusCode = result.code || (result.success ? 200 : 500)
+    await appendLog({ method, path: fullPath, status: statusCode, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json({
       status: result.success,
       creator: siteConfig.api.creator,
@@ -133,6 +140,7 @@ async function handleRequest(req: NextRequest, body?: any) {
     });
   } catch (err: any) {
     console.error('Humanize error:', err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
     return NextResponse.json(
       { status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' },
       { status: 500 }

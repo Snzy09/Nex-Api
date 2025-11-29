@@ -3,8 +3,13 @@
 import { NextResponse } from "next/server";
 import { siteConfig, getApiStatus } from "@/settings/config";
 import AiGeminiLite from "@/lib/gemini";
+import { appendLog } from '@/lib/filelogger'
 
 export async function POST(request: Request) {
+  const start = Date.now()
+  const urlObj = new URL(request.url)
+  const fullPath = urlObj.pathname + (urlObj.search || '')
+  const method = 'POST'
   const apiStatus = getApiStatus("/api/ai/gemini-lite");
 
   if (apiStatus.status === "offline") {
@@ -38,18 +43,26 @@ export async function POST(request: Request) {
 
   try {
     const result = await AiGeminiLite(prompt, { model, imgUrl })
-    return new NextResponse(JSON.stringify({ status: result.status, creator: siteConfig.api.creator, result }, null, 2), { headers: { "Content-Type": "application/json; charset=utf-8" } })
+    const resp = new NextResponse(JSON.stringify({ status: result.status, creator: siteConfig.api.creator, result }, null, 2), { headers: { "Content-Type": "application/json; charset=utf-8" } })
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+    return resp
   } catch (error: any) {
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
     return new NextResponse(JSON.stringify({ status: false, creator: siteConfig.api.creator, error: error?.message ?? 'External API error' }, null, 2), { status: 500, headers: { "Content-Type": "application/json; charset=utf-8" } })
   }
 }
 
 export async function GET() {
+  const start = Date.now()
+  const fullPath = '/api/ai/gemini-lite'
+  const method = 'GET'
   const apiStatus = getApiStatus("/api/ai/gemini-lite");
 
   if (apiStatus.status === "offline") {
+    await appendLog({ method, path: fullPath, status: 503, responseTimeMs: Date.now() - start }).catch(()=>{})
     return new NextResponse(JSON.stringify({ status: false, creator: siteConfig.api.creator, error: "This API endpoint is currently offline.", endpoint: "/api/ai/gemini-lite", apiStatus: "offline", version: "v1" }, null, 2), { status: 503, headers: { "Content-Type": "application/json; charset=utf-8" } });
   }
 
+  await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
   return new NextResponse(JSON.stringify({ status: true, creator: siteConfig.api.creator, message: "Gemini Lite endpoint", apiStatus: apiStatus.status, version: "v1" }, null, 2), { headers: { "Content-Type": "application/json; charset=utf-8" } })
 }

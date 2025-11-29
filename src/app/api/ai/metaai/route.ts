@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 function generateUUIDv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
@@ -239,9 +240,13 @@ class MetaAI {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const message = (body?.message ?? body?.text ?? req.nextUrl.searchParams.get('message') ?? req.nextUrl.searchParams.get('text'))?.toString()?.trim();
 
   if (!message) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing message' }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,
@@ -257,6 +262,7 @@ async function handleRequest(req: NextRequest, body?: any) {
     const response = await metaAI.scrape(message);
 
     if (!response) {
+      await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, message: 'empty response' }).catch(()=>{})
       return NextResponse.json(
         {
           status: false,
@@ -267,6 +273,7 @@ async function handleRequest(req: NextRequest, body?: any) {
       );
     }
 
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json(
       {
         status: true,
@@ -280,6 +287,7 @@ async function handleRequest(req: NextRequest, body?: any) {
     );
   } catch (error: any) {
     console.error('❌ Meta AI Error:', error.message);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
 
     return NextResponse.json(
       {

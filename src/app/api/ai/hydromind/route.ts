@@ -2,6 +2,7 @@
 
 import { NextResponse } from "next/server"
 import { siteConfig, getApiStatus } from "@/settings/config"
+import { appendLog } from '@/lib/filelogger'
 
 const API_TIMEOUT = 10000
 
@@ -55,9 +56,15 @@ async function hydromind(content: string, model: string, responses?: number) {
 }
 
 export async function POST(request: Request) {
+  const start = Date.now()
+  const url = new URL(request.url)
+  const fullPath = url.pathname + (url.search || '')
+  const method = request.method || 'POST'
+
   const apiStatus = getApiStatus("/ai/hydromind")
 
   if (apiStatus.status === "offline") {
+    await appendLog({ method, path: fullPath, status: 503, responseTimeMs: Date.now() - start, message: 'api offline' }).catch(()=>{})
     return new NextResponse(
       JSON.stringify(
         {
@@ -81,6 +88,7 @@ export async function POST(request: Request) {
   }
 
   if (siteConfig.maintenance.enabled) {
+    await appendLog({ method, path: fullPath, status: 503, responseTimeMs: Date.now() - start, message: 'maintenance' }).catch(()=>{})
     return new NextResponse(
       JSON.stringify(
         {
@@ -105,6 +113,7 @@ export async function POST(request: Request) {
     try {
       body = await request.json()
     } catch (error) {
+      await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'invalid json' }).catch(()=>{})
       return new NextResponse(
         JSON.stringify(
           {
@@ -127,6 +136,7 @@ export async function POST(request: Request) {
     const { text, model, responses } = body
 
     if (!text || !model) {
+      await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing text or model' }).catch(()=>{})
       return new NextResponse(
         JSON.stringify(
           {
@@ -168,6 +178,7 @@ export async function POST(request: Request) {
       )
     } catch (error) {
       if (error instanceof Error && error.message.includes("timed out")) {
+        await appendLog({ method, path: fullPath, status: 504, responseTimeMs: Date.now() - start, error: 'external timeout' }).catch(()=>{})
         return new NextResponse(
           JSON.stringify(
             {
@@ -187,6 +198,7 @@ export async function POST(request: Request) {
         )
       }
 
+      await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
       return new NextResponse(
         JSON.stringify(
           {
@@ -207,6 +219,7 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error("Unhandled error in hydromind route:", error)
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
     return new NextResponse(
       JSON.stringify(
         {
