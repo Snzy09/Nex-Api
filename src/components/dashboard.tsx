@@ -32,6 +32,8 @@ function useServerMetrics(pollInterval = 3000) {
     const mounted = useRef(true);
 
     useEffect(() => {
+        // Don't auto-fetch when pollInterval is 0 or negative
+        if (!pollInterval || pollInterval <= 0) return;
         mounted.current = true;
 
         const fetchMetrics = async () => {
@@ -87,7 +89,8 @@ export function Dashboard() {
     const totalCategories = Object.keys(apiEndpoints).length;
     const totalEndpoints = Object.values(apiEndpoints).reduce((acc, category) => acc + category.endpoints.length, 0);
 
-    const { current, history, rawMetrics } = useServerMetrics(3000 as any);
+    // pass 0 to disable automatic polling
+    const { current, history, rawMetrics } = useServerMetrics(0 as any);
 
     const recentLogs = rawMetrics?.metrics?.recentLogs ?? [];
     const ipCounts = rawMetrics?.metrics?.ipCounts ?? {};
