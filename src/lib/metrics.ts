@@ -72,6 +72,32 @@ export const metrics = {
         // ignore Firebase errors to avoid breaking metrics recording
       }
     })()
+
+    // also update daily counters document (date-based) in Firestore so daily windows are shared
+    ;(async () => {
+      try {
+        await initFirebaseIfNeeded()
+        if (!firebaseAvailable || !firebaseDb) return
+        const { doc, updateDoc, setDoc, increment } = await import('firebase/firestore')
+        const offsetMs = 7 * 60 * 60 * 1000
+        const jakarta = new Date(Date.now() + offsetMs)
+        const y = jakarta.getUTCFullYear()
+        const m = String(jakarta.getUTCMonth() + 1).padStart(2, '0')
+        const d = String(jakarta.getUTCDate()).padStart(2, '0')
+        const dateId = `${y}-${m}-${d}`
+        const dailyRef = doc(firebaseDb, 'daily_counters', dateId)
+        try {
+          await updateDoc(dailyRef, {
+            [`routes.${path}`]: increment(1),
+            totalRequests: increment(1),
+          })
+        } catch (e) {
+          await setDoc(dailyRef, { totalRequests: 1, routes: { [path]: 1 }, ips: {} }, { merge: true })
+        }
+      } catch (e) {
+        // ignore
+      }
+    })()
   },
 
   logRequest(info: { path: string; method: string; ip?: string; ua?: string }) {

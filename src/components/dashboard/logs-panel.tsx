@@ -63,14 +63,17 @@ export function LogsPanel({ limit = 100 }: { limit?: number }) {
             </tr>
           </thead>
           <tbody>
-            {logs.slice(0, 200).map((log: any, idx: number) => (
-              <tr key={idx} className="border-t">
-                <td className="p-2">{new Date(log.timestamp ?? log.ts ?? Date.now()).toLocaleTimeString()}</td>
-                <td className="p-2 font-mono">{log.status ?? log.code ?? '-'}</td>
-                <td className="p-2 font-mono truncate">{log.path ?? log.request ?? log.url ?? '-'}</td>
-                <td className="p-2 font-mono">{log.ip ?? '-'}</td>
-              </tr>
-            ))}
+            {logs.slice(0, 200).map((log: any, idx: number) => {
+              const isMe = requesterIp && log.ip && requesterIp === log.ip
+              return (
+                <tr key={idx} className={`border-t ${isMe ? 'bg-yellow-50' : ''}`}>
+                  <td className="p-2">{new Date(log.timestamp ?? log.ts ?? Date.now()).toLocaleTimeString()}</td>
+                  <td className="p-2 font-mono">{log.status ?? log.code ?? '-'}</td>
+                  <td className="p-2 font-mono truncate">{log.path ?? log.request ?? log.url ?? '-'}</td>
+                  <td className="p-2 font-mono">{log.ip ?? '-'}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

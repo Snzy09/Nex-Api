@@ -26,9 +26,6 @@ async function initFirebase() {
 
 export async function POST(request: Request) {
   const { db } = await initFirebase()
-  if (!db) {
-    return NextResponse.json({ status: false, error: 'Firebase not configured' }, { status: 500 })
-  }
 
   let body: any
   try {
@@ -52,22 +49,29 @@ export async function POST(request: Request) {
     message: body.message || null,
   }
 
+  // Always append to local file-based logger (best-effort, non-blocking)
   try {
-    const { collection, addDoc } = await import('firebase/firestore')
-    // also append to local access log file for dashboard file-based reads
-    try {
-      const { appendLog } = await import('@/lib/filelogger')
-      appendLog(log).catch(() => {})
-    } catch (e) {
-      // ignore
-    }
-
-    const col = collection(db, 'logs')
-    const docRef = await addDoc(col, log)
-    return NextResponse.json({ status: true, id: docRef.id })
-  } catch (err: any) {
-    return NextResponse.json({ status: false, error: err?.message ?? String(err) }, { status: 500 })
+    const { appendLog } = await import('@/lib/filelogger')
+    appendLog(log).catch(() => {})
+  } catch (e) {
+    // ignore
   }
+
+  // Try to persist into Firestore if available, but don't fail the request when Firestore is missing or errors.
+  if (db) {
+    ;(async () => {
+      try {
+        const { collection, addDoc } = await import('firebase/firestore')
+        const col = collection(db, 'logs')
+        await addDoc(col, log)
+      } catch (err) {
+        // ignore Firestore failures
+      }
+    })()
+  }
+
+  // Return success regardless of Firestore availability. Local appendLog should have recorded the entry.
+  return NextResponse.json({ status: true })
 }
 
 export async function GET(request: Request) {
