@@ -273,36 +273,6 @@ export const siteConfig = {
             ],
         },
         {
-          name: 'AI Copilot',
-          path: '/api/ai/copilot',
-          description: 'A versatile AI tool for text manipulation.',
-          methods: ['POST'],
-          status: 'online',
-          parameters: [
-            { name: 'text', type: 'string', description: 'The input text to process.', required: true },
-            {
-              name: 'module',
-              type: 'select',
-              description: 'The AI module to use.',
-              required: true,
-              options: ['SUMMARIZE', 'PARAPHRASE', 'EXPAND', 'TONE', 'TRANSLATE', 'REPLY', 'GRAMMAR'],
-            },
-            { name: 'to', type: 'string', description: 'The target for the module (e.g., language, tone, reply length).', required: false },
-            { name: 'customTone', type: 'string', description: "Custom tone if module is 'TONE' and 'to' is 'Other'.", required: false },
-          ],
-        },
-                {
-                    name: 'AI Copilot 2',
-                    path: '/api/ai/copilot-2',
-                    description: 'Copilot AI (alternate entry) — chat with Copilot via message + model (v2).',
-                    methods: ['GET', 'POST'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'message', type: 'string', description: 'The message to send to Copilot-2.', required: true },
-                        { name: 'model', type: 'string', description: 'Optional model key (e.g., default, think-deeper, gpt-5).', required: false },
-                    ],
-                },
-        {
           name: 'Humanize',
           path: '/api/ai/humanize',
           description: 'Humanize AI-generated text to appear more natural.',
@@ -349,23 +319,7 @@ export const siteConfig = {
                     parameters: []
                 }
             ]
-        },
-                system: {
-                    name: 'System',
-                    description: 'System-level endpoints (health, version, docs).',
-                    endpoints: [
-                        {
-                            name: 'Status',
-                            path: '/api/status',
-                            description: 'Health and uptime status.',
-                            methods: ['GET'],
-                            status: 'online',
-                            parameters: []
-                        },
-                        
-                    ]
-                },
-                
+        },              
         anime: {
         name: 'Anime',
         description: 'Endpoints for fetching anime-related data.',
