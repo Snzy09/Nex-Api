@@ -32,8 +32,6 @@ function useServerMetrics(pollInterval = 3000) {
     const mounted = useRef(true);
 
     useEffect(() => {
-        // Don't auto-fetch when pollInterval is 0 or negative
-        if (!pollInterval || pollInterval <= 0) return;
         mounted.current = true;
 
         const fetchMetrics = async () => {
@@ -73,11 +71,16 @@ function useServerMetrics(pollInterval = 3000) {
             }
         };
 
+        // Always fetch once on mount so dashboard panels (top endpoints/IPs) have data
         fetchMetrics();
-        const id = setInterval(fetchMetrics, pollInterval);
+        // Only set up interval when pollInterval > 0
+        let id: any = null
+        if (pollInterval && pollInterval > 0) {
+            id = setInterval(fetchMetrics, pollInterval);
+        }
         return () => {
             mounted.current = false;
-            clearInterval(id);
+            if (id) clearInterval(id);
         };
     }, [pollInterval]);
 

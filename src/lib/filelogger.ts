@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { metrics } from '@/lib/metrics'
 
 const LOG_DIR = path.join(process.cwd(), 'logs')
 const LOG_FILE = path.join(LOG_DIR, 'access.log')
@@ -44,6 +45,22 @@ export async function appendLog(entry: LogEntry) {
     } catch (err) {
       // ignore
     }
+  }
+
+  // Update in-memory metrics (best-effort) so dashboard aggregates work
+  try {
+    // record request count per path
+    if (e.path) {
+      try { metrics.recordRequest(e.path) } catch (_) {}
+    }
+    // record recent request log (method/ip)
+    try { metrics.logRequest({ path: e.path || '', method: e.method || 'GET', ip: e.ip || e.clientIp || 'unknown', ua: e.ua || e.userAgent }) } catch (_) {}
+    // record response time if available
+    if (typeof e.responseTimeMs === 'number') {
+      try { metrics.recordResponse(e.path || '', Number(e.responseTimeMs)) } catch (_) {}
+    }
+  } catch (err) {
+    // ignore metrics errors
   }
 
   return e
