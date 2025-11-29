@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 class Wallpaper {
     private base = 'https://4kwallpapers.com';
@@ -51,11 +52,15 @@ class Wallpaper {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+    const start = Date.now()
+    const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+    const method = req.method
     const type = body?.type?.trim() || req.nextUrl.searchParams.get('type')?.trim() || 'home';
 
     try {
         const wallpaper = new Wallpaper();
         const result = await wallpaper.main(type);
+        await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
         return NextResponse.json({
             status: true,
             creator: siteConfig.api.creator,
@@ -63,6 +68,7 @@ async function handleRequest(req: NextRequest, body?: any) {
         });
     } catch (err: any) {
         console.error('Wallpaper error:', err);
+        await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
     }
 }
