@@ -134,47 +134,47 @@ export const siteConfig = {
             },
           ],
         },
-                {
-                    name: 'Unrestricted AI Image',
-                    path: '/api/ai/unrestrictedai',
-                    description: 'Generate images using Unrestricted AI image generator.',
-                    methods: ['GET', 'POST'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'prompt', type: 'string', description: 'The prompt for image generation.', required: true },
-                        { name: 'style', type: 'select', description: 'Image style to use.', required: false, options: ['photorealistic', 'digital-art', 'impressionist', 'anime', 'fantasy', 'sci-fi', 'vintage'] },
-                    ],
-                },
-                {
-                    name: 'Raka AI',
-                    path: '/api/ai/raka',
-                    description: 'Chat with Reka AI (reka.ai) — send `text` or `message` in POST body.',
-                    methods: ['POST'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'text', type: 'string', description: 'The message to send to Reka AI.', required: true },
-                    ],
-                },
-                {
-                    name: 'ChatGPT 4o',
-                    path: '/api/ai/chatgpt4o',
-                    description: 'Chat With ChatGPT 4o.',
-                    methods: ['POST'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'text', type: 'string', description: 'The message to send to ChatGPT 4o.', required: true },
-                    ],
-                },
-                {
-                    name: 'Exa AI',
-                    path: '/api/ai/exaai',
-                    description: 'Chat with Exa AI (chat.exa.ai).',
-                    methods: ['GET', 'POST'],
-                    status: 'online',
-                    parameters: [
-                        { name: 'text', type: 'string', description: 'The message to send to Exa AI.', required: true },
-                    ],
-                },
+        {
+          name: 'Unrestricted AI Image',
+          path: '/api/ai/unrestrictedai',
+          description: 'Generate images using Unrestricted AI image generator.',
+          methods: ['POST'],
+          status: 'online',
+          parameters: [
+            { name: 'prompt', type: 'string', description: 'The prompt for image generation.', required: true },
+            { name: 'style', type: 'select', description: 'Image style to use.', required: false, options: ['photorealistic', 'digital-art', 'impressionist', 'anime', 'fantasy', 'sci-fi', 'vintage'] },
+          ],
+        },
+        {
+          name: 'Raka AI',
+          path: '/api/ai/raka',
+          description: 'Chat with Reka AI (reka.ai) — send `text` or `message` in POST body.',
+          methods: ['POST'],
+          status: 'online',
+          parameters: [
+            { name: 'text', type: 'string', description: 'The message to send to Reka AI.', required: true },
+          ],
+     },
+     {
+          name: 'ChatGPT 4o',
+          path: '/api/ai/chatgpt4o',
+          description: 'Chat With ChatGPT 4o.',
+          methods: ['POST'],
+          status: 'online',
+          parameters: [
+            { name: 'text', type: 'string', description: 'The message to send to ChatGPT 4o.', required: true },
+          ],
+        },
+        {
+          name: 'Exa AI',
+          path: '/api/ai/exaai',
+          description: 'Chat with Exa AI (chat.exa.ai).',
+          methods: ['POST'],
+          status: 'online',
+          parameters: [
+            { name: 'text', type: 'string', description: 'The message to send to Exa AI.', required: true },
+          ],
+        },
         {
           name: 'Turbo GPT-3.5',
           path: '/api/ai/turbo-gpt3',
