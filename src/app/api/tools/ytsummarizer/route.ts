@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 function generateRandomDeviceHash() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -86,16 +87,20 @@ async function ytsummarizer(url: string, { lang = 'id' } = {}) {
 
 
 export async function POST(req: NextRequest) {
+    const start = Date.now()
+    const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+    const method = req.method
     try {
         const body = await req.json();
         const { url, lang } = body;
 
         if (!url) {
+            await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing url' }).catch(()=>{})
             return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'URL parameter is required' }, { status: 400 });
         }
         
         const result = await ytsummarizer(url, { lang });
-
+        await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
         return NextResponse.json({
             status: true,
             creator: siteConfig.api.creator,
@@ -104,6 +109,7 @@ export async function POST(req: NextRequest) {
 
     } catch (err: any) {
         console.error('YouTube Summarizer error:', err);
+        await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
     }
 }

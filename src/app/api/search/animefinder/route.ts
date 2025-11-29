@@ -8,6 +8,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function findAnime(imagePath: string) {
     const data = new FormData();
@@ -36,11 +37,15 @@ async function findAnime(imagePath: string) {
 
 
 export async function POST(req: NextRequest) {
+    const start = Date.now()
+    const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+    const method = req.method
     try {
         const formData = await req.formData();
         const imageFile = formData.get('image') as File | null;
 
         if (!imageFile) {
+            await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing image' }).catch(()=>{})
             return NextResponse.json({ creator: siteConfig.api.creator, error: 'Image file is required.' }, { status: 400 });
         }
         
@@ -53,16 +58,9 @@ export async function POST(req: NextRequest) {
 
         try {
             const result = await findAnime(tempFilePath);
-            const teks = `*Judul :* ${result.animeTitle || '-'}
-*Karakter :* ${result.character || '-'}
-*Deskripsi :* ${result.description || '-'}
-*Genre :* ${result.genres || '-'}
-*Studio :* ${result.productionHouse || '-'}
-*Tayang :* ${result.premiereDate || '-'}
+            const teks = `*Judul :* ${result.animeTitle || '-'}\n*Karakter :* ${result.character || '-'}\n*Deskripsi :* ${result.description || '-'}\n*Genre :* ${result.genres || '-'}\n*Studio :* ${result.productionHouse || '-'}\n*Tayang :* ${result.premiereDate || '-'}\n\n*Sinopsis :*\n${result.synopsis || '-'}`;
 
-*Sinopsis :*
-${result.synopsis || '-'}`;
-
+            await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
             return NextResponse.json({ 
                 creator: siteConfig.api.creator,
                 status: true,
@@ -76,6 +74,7 @@ ${result.synopsis || '-'}`;
 
     } catch (error: any) {
         console.error('Anime finder error:', error);
+        await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
         return NextResponse.json({ creator: siteConfig.api.creator, status: false, error: error.message || 'An unexpected error occurred.' }, { status: 500 });
     }
 }

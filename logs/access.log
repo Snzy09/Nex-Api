@@ -1,0 +1,17 @@
+{"timestamp":"2025-11-29T08:38:14.472Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":70.5,"memoryUsage":58.11,"ramUsedMB":4617}
+{"timestamp":"2025-11-29T08:38:15.156Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":70.5,"memoryUsage":58.63,"ramUsedMB":4658}
+{"timestamp":"2025-11-29T08:38:15.313Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":70.5,"memoryUsage":58.62,"ramUsedMB":4657}
+{"timestamp":"2025-11-29T08:38:16.997Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":70.5,"memoryUsage":58.54,"ramUsedMB":4651}
+{"timestamp":"2025-11-29T08:38:20.278Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":65,"memoryUsage":58.51,"ramUsedMB":4649}
+{"timestamp":"2025-11-29T08:38:23.111Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":65,"memoryUsage":58.46,"ramUsedMB":4644}
+{"timestamp":"2025-11-29T08:38:25.962Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":59.5,"memoryUsage":58.79,"ramUsedMB":4670}
+{"timestamp":"2025-11-29T08:38:29.244Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":59,"memoryUsage":58.87,"ramUsedMB":4677}
+{"timestamp":"2025-11-29T08:38:32.040Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":59,"memoryUsage":58.85,"ramUsedMB":4676}
+{"timestamp":"2025-11-29T08:38:35.111Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":78.5,"memoryUsage":59.03,"ramUsedMB":4690}
+{"timestamp":"2025-11-29T08:38:38.166Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":78.5,"memoryUsage":59.14,"ramUsedMB":4699}
+{"timestamp":"2025-11-29T08:38:41.194Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":72,"memoryUsage":58.74,"ramUsedMB":4667}
+{"timestamp":"2025-11-29T08:38:43.832Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":72,"memoryUsage":58.67,"ramUsedMB":4661}
+{"timestamp":"2025-11-29T08:38:46.898Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":66,"memoryUsage":58.59,"ramUsedMB":4655}
+{"timestamp":"2025-11-29T08:38:50.229Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":0,"cpuUsage":69,"memoryUsage":58.62,"ramUsedMB":4657}
+{"timestamp":"2025-11-29T08:38:53.108Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":69,"memoryUsage":59.97,"ramUsedMB":4764}
+{"timestamp":"2025-11-29T08:38:55.894Z","method":"GET","path":"/api/monitor/metrics","status":200,"responseTimeMs":1,"cpuUsage":79.5,"memoryUsage":61.18,"ramUsedMB":4860}

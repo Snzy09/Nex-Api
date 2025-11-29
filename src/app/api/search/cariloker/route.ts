@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function cariLoker(pekerjaan: string, kota: string, jumlah: number = 10) {
   if (!pekerjaan || !kota) throw new Error('Parameter "pekerjaan" dan "kota" harus diisi');
@@ -52,20 +53,26 @@ async function cariLoker(pekerjaan: string, kota: string, jumlah: number = 10) {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const pekerjaan = (body?.pekerjaan ?? req.nextUrl.searchParams.get('pekerjaan') ?? body?.q ?? req.nextUrl.searchParams.get('q'))?.toString()?.trim();
   const kota = (body?.kota ?? req.nextUrl.searchParams.get('kota') ?? body?.city ?? req.nextUrl.searchParams.get('city'))?.toString()?.trim();
   const jumlahRaw = (body?.jumlah ?? req.nextUrl.searchParams.get('jumlah'))?.toString();
   const jumlah = jumlahRaw ? Number(jumlahRaw) : 10;
 
   if (!pekerjaan || !kota) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing parameters' }).catch(()=>{});
     return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Parameters "pekerjaan" and "kota" are required.' }, { status: 400 });
   }
 
   try {
     const result = await cariLoker(pekerjaan, kota, jumlah);
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{});
     return NextResponse.json({ status: true, creator: siteConfig.api.creator, data: result });
   } catch (err: any) {
     console.error('CariLoker error:', err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{});
     return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }

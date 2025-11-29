@@ -3,6 +3,7 @@
 import axios from 'axios';
 import { NextResponse, NextRequest } from 'next/server';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function scrape(query: string) {
   const headers = {
@@ -46,25 +47,32 @@ async function scrape(query: string) {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
-    const query = body?.query?.trim() || req.nextUrl.searchParams.get('query')?.trim();
-    if (!query) {
-        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Query parameter is required', code: 400 }, { status: 400 });
-    }
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
+  const query = body?.query?.trim() || req.nextUrl.searchParams.get('query')?.trim();
+  if (!query) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing query' }).catch(()=>{})
+    return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Query parameter is required', code: 400 }, { status: 400 });
+  }
 
-    try {
-        const result = await scrape(query);
-        return NextResponse.json({
-            status: true,
-            creator: siteConfig.api.creator,
-            data: result,
-            timestamp: new Date().toISOString(),
-        });
-    } catch (err: any) {
-        if (err.isAxiosError && err.code === 'ECONNABORTED') {
-            return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: "Request timed out", code: 504 }, { status: 504 });
-        }
-        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error', code: 500 }, { status: 500 });
+  try {
+    const result = await scrape(query);
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+    return NextResponse.json({
+      status: true,
+      creator: siteConfig.api.creator,
+      data: result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    if (err.isAxiosError && err.code === 'ECONNABORTED') {
+      await appendLog({ method, path: fullPath, status: 504, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
+      return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: "Request timed out", code: 504 }, { status: 504 });
     }
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
+    return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error', code: 500 }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {

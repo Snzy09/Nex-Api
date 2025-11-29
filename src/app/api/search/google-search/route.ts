@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 const g = {
   helper: {
@@ -100,9 +101,14 @@ const g = {
 };
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const url = new URL(req.url)
+  const fullPath = url.pathname + (url.search || '')
+  const method = req.method || 'GET'
   const query = (body?.query ?? body?.search ?? req.nextUrl.searchParams.get('query') ?? req.nextUrl.searchParams.get('search'))?.toString()?.trim();
 
   if (!query) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing query' }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,
@@ -115,7 +121,7 @@ async function handleRequest(req: NextRequest, body?: any) {
 
   try {
     const result = await g.search(query);
-
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json(
       {
         status: true,
@@ -129,7 +135,7 @@ async function handleRequest(req: NextRequest, body?: any) {
     );
   } catch (error: any) {
     console.error('❌ Google Search Error:', error.message);
-
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,

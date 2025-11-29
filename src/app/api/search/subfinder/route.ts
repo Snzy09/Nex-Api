@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 class PentestFinder {
   private ua: string;
@@ -115,9 +116,13 @@ class PentestFinder {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const target = (body?.target ?? body?.url ?? req.nextUrl.searchParams.get('target') ?? req.nextUrl.searchParams.get('url'))?.toString()?.trim();
 
   if (!target) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing target' }).catch(()=>{})
     return NextResponse.json(
       { status: false, creator: siteConfig.api.creator, error: 'Target parameter is required (target or url).' },
       { status: 400 }
@@ -127,9 +132,11 @@ async function handleRequest(req: NextRequest, body?: any) {
   try {
     const pentest = new PentestFinder();
     const result = await pentest.finder(target);
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json({ status: true, creator: siteConfig.api.creator, data: result });
   } catch (err: any) {
     console.error('Subfinder error:', err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
     return NextResponse.json(
       { status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' },
       { status: 500 }

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function searchLyrics(title: string) {
     if (!title) {
@@ -43,13 +44,18 @@ async function searchLyrics(title: string) {
 
 
 async function handleRequest(req: NextRequest, body?: any) {
+    const start = Date.now()
+    const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+    const method = req.method
     const title = body?.title?.trim() || req.nextUrl.searchParams.get('title')?.trim();
     if (!title) {
+        await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing title' }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Title parameter is required' }, { status: 400 });
     }
 
     try {
         const result = await searchLyrics(title);
+        await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
         return NextResponse.json({
             status: true,
             creator: siteConfig.api.creator,
@@ -57,6 +63,7 @@ async function handleRequest(req: NextRequest, body?: any) {
         });
     } catch (err: any) {
         console.error('Lyrics search error:', err);
+        await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
     }
 }
