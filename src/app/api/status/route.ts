@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { metrics } from '@/lib/metrics'
 import os from 'os'
 import fs from 'fs'
+import { appendLog } from '@/lib/filelogger'
 
 function formatBytes(bytes: number) {
   if (bytes === 0) return '0 B'
@@ -89,9 +90,19 @@ export async function GET() {
     }
 
     metrics.recordResponse('/api/status', Date.now() - start)
+    try {
+      await appendLog({ method: 'GET', path: '/api/status', status: 200, responseTimeMs: Date.now() - start })
+    } catch (e) {
+      // best-effort
+    }
     return NextResponse.json(payload)
   } catch (err: any) {
     metrics.recordResponse('/api/status', Date.now() - start)
+    try {
+      await appendLog({ method: 'GET', path: '/api/status', status: 500, responseTimeMs: Date.now() - start, error: String(err) })
+    } catch (e) {
+      // ignore
+    }
     return NextResponse.json({ status: false, error: String(err) }, { status: 500 })
   }
 }
