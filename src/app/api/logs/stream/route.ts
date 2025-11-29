@@ -31,7 +31,7 @@ export async function GET() {
   // SSE stream via Firestore onSnapshot (best-effort). Note: long-lived server-side listeners
   // may not be supported in all hosting environments. For production consider client-side onSnapshot
   // or a dedicated logging pipeline.
-  const { collection, query, orderBy, limit as limitFn, onSnapshot } = await import('firebase/firestore')
+  const { collection, query, orderBy, limit: limitFn, onSnapshot } = await import('firebase/firestore')
 
   const q = query(collection(db, 'logs'), orderBy('timestamp', 'desc'), limitFn(100))
 
