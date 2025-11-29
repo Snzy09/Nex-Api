@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from "axios";
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger';
 
 async function TwitterStalk(usn: string) {
    const { data: profile } = await axios.get(`https://www.twitter-viewer.com/api/x/user?username=${usn}`);
@@ -21,20 +22,27 @@ async function TwitterStalk(usn: string) {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+    const start = Date.now()
+    const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+    const method = req.method
     const usn = body?.usn?.trim() || req.nextUrl.searchParams.get('usn')?.trim();
     if (!usn) {
+        await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing usn' }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Twitter username (usn) parameter is required' }, { status: 400 });
     }
 
     try {
         const result = await TwitterStalk(usn);
-        return NextResponse.json({
+        const resp = NextResponse.json({
             status: true,
             creator: siteConfig.api.creator,
             data: result,
         });
+        await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+        return resp
     } catch (err: any) {
         console.error('Twitter Stalk error:', err);
+        await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
     }
 }

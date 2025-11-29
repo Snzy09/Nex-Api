@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger';
 
 async function kompas() {
     let { data } = await axios.get('https://www.kompas.com/');
@@ -47,15 +48,21 @@ async function kompas() {
 
 
 async function handleRequest(req: NextRequest) {
+    const start = Date.now()
+    const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+    const method = req.method
     try {
         const result = await kompas();
-        return NextResponse.json({
+        const resp = NextResponse.json({
             status: true,
             creator: siteConfig.api.creator,
             data: result,
         });
+        await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+        return resp
     } catch (err: any) {
         console.error('Kompas News error:', err);
+        await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
     }
 }

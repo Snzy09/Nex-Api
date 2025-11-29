@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger';
 
 class Resep {
   private baseUrl = 'https://mobile.fatsecret.co.id';
@@ -40,23 +41,30 @@ class Resep {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
-    const query = body?.query?.trim() || req.nextUrl.searchParams.get('query')?.trim();
-    if (!query) {
-        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Query parameter is required' }, { status: 400 });
-    }
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
+  const query = body?.query?.trim() || req.nextUrl.searchParams.get('query')?.trim();
+  if (!query) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing query' }).catch(()=>{})
+    return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'Query parameter is required' }, { status: 400 });
+  }
 
-    try {
-        const resep = new Resep();
-        const result = await resep.search(query);
-        return NextResponse.json({
-            status: true,
-            creator: siteConfig.api.creator,
-            data: result,
-        });
-    } catch (err: any) {
-        console.error('FatSecret Recipe Search error:', err);
-        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
-    }
+  try {
+    const resep = new Resep();
+    const result = await resep.search(query);
+    const resp = NextResponse.json({
+      status: true,
+      creator: siteConfig.api.creator,
+      data: result,
+    });
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+    return resp
+  } catch (err: any) {
+    console.error('FatSecret Recipe Search error:', err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
+    return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {

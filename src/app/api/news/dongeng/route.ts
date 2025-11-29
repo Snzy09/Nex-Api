@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger';
 
 async function scrapeData(url: string) {
   try {
@@ -27,9 +28,13 @@ async function scrapeData(url: string) {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const url = (body?.url ?? req.nextUrl.searchParams.get('url'))?.toString()?.trim();
 
   if (!url) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing url' }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,
@@ -42,6 +47,7 @@ async function handleRequest(req: NextRequest, body?: any) {
 
   // Validate URL is from 1000dongeng.com
   if (!url.includes('1000dongeng.com')) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'invalid domain' }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,
@@ -56,6 +62,7 @@ async function handleRequest(req: NextRequest, body?: any) {
     const result = await scrapeData(url);
 
     if (!result) {
+      await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, message: 'scrape failed' }).catch(()=>{})
       return NextResponse.json(
         {
           status: false,
@@ -66,16 +73,19 @@ async function handleRequest(req: NextRequest, body?: any) {
       );
     }
 
-    return NextResponse.json(
+    const resp = NextResponse.json(
       {
         status: true,
         creator: siteConfig.api.creator,
         data: result,
       },
       { status: 200 }
-    );
+    )
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+    return resp
   } catch (error: any) {
     console.error('❌ Dongeng Scraper Error:', error.message);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
 
     return NextResponse.json(
       {
