@@ -7,6 +7,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 const availableScaleRatio = [2, 4];
 
@@ -78,37 +79,44 @@ const imgupscale = {
 };
 
 export async function POST(req: NextRequest) {
-    try {
-        const formData = await req.formData();
-        const imageFile = formData.get('image') as File | null;
-        const scale = formData.get('scale') as string | null;
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
+  try {
+    const formData = await req.formData();
+    const imageFile = formData.get('image') as File | null;
+    const scale = formData.get('scale') as string | null;
 
-        if (!imageFile) {
-            return NextResponse.json({ creator: siteConfig.api.creator, error: 'Image file is required.' }, { status: 400 });
-        }
-
-        const scaleRatio = parseInt(scale || '2', 10);
-        if (!availableScaleRatio.includes(scaleRatio)) {
-            return NextResponse.json({ creator: siteConfig.api.creator, error: 'Invalid scale ratio. Available ratios: 2, 4' }, { status: 400 });
-        }
-        
-        const tempDir = os.tmpdir();
-        const tempFileName = `upload_${Date.now()}_${imageFile.name}`;
-        const tempFilePath = path.join(tempDir, tempFileName);
-
-        const buffer = Buffer.from(await imageFile.arrayBuffer());
-        await fs.promises.writeFile(tempFilePath, buffer);
-
-        try {
-            const result = await imgupscale.upscale(tempFilePath, scaleRatio);
-            return NextResponse.json({ creator: siteConfig.api.creator, ...result });
-        } finally {
-            // Clean up the temporary file
-            await fs.promises.unlink(tempFilePath);
-        }
-
-    } catch (error: any) {
-        console.error('Image upscaling error:', error);
-        return NextResponse.json({ creator: siteConfig.api.creator, error: error.message || 'An unexpected error occurred.' }, { status: 500 });
+    if (!imageFile) {
+      await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing image' }).catch(()=>{})
+      return NextResponse.json({ creator: siteConfig.api.creator, error: 'Image file is required.' }, { status: 400 });
     }
+
+    const scaleRatio = parseInt(scale || '2', 10);
+    if (!availableScaleRatio.includes(scaleRatio)) {
+      await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'invalid scale' }).catch(()=>{})
+      return NextResponse.json({ creator: siteConfig.api.creator, error: 'Invalid scale ratio. Available ratios: 2, 4' }, { status: 400 });
+    }
+        
+    const tempDir = os.tmpdir();
+    const tempFileName = `upload_${Date.now()}_${imageFile.name}`;
+    const tempFilePath = path.join(tempDir, tempFileName);
+
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
+    await fs.promises.writeFile(tempFilePath, buffer);
+
+    try {
+      const result = await imgupscale.upscale(tempFilePath, scaleRatio);
+      await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+      return NextResponse.json({ creator: siteConfig.api.creator, ...result });
+    } finally {
+      // Clean up the temporary file
+      await fs.promises.unlink(tempFilePath);
+    }
+
+  } catch (error: any) {
+    console.error('Image upscaling error:', error);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
+    return NextResponse.json({ creator: siteConfig.api.creator, error: error.message || 'An unexpected error occurred.' }, { status: 500 });
+  }
 }

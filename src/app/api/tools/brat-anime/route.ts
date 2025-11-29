@@ -3,11 +3,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const text = (body?.text ?? req.nextUrl.searchParams.get('text'))?.toString()?.trim();
 
   if (!text) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing text' }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,
@@ -36,6 +41,7 @@ async function handleRequest(req: NextRequest, body?: any) {
 
     if (contentType && contentType.includes('application/json')) {
       const jsonResponse = JSON.parse(response.data.toString());
+      await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: JSON.stringify(jsonResponse) }).catch(()=>{})
       return NextResponse.json(
         {
           status: false,
@@ -51,6 +57,7 @@ async function handleRequest(req: NextRequest, body?: any) {
     const base64Image = imageBuffer.toString('base64');
     const dataUrl = `data:image/jpeg;base64,${base64Image}`;
 
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json(
       {
         status: true,
@@ -70,6 +77,7 @@ async function handleRequest(req: NextRequest, body?: any) {
       if (error.response?.data) {
         console.error(`Data: ${error.response.data.toString()}`);
       }
+      await appendLog({ method, path: fullPath, status: error.response?.status || 500, responseTimeMs: Date.now() - start, error: String(error?.response?.data || error.message) }).catch(()=>{})
       return NextResponse.json(
         {
           status: false,
@@ -80,6 +88,7 @@ async function handleRequest(req: NextRequest, body?: any) {
       );
     }
 
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error?.message || error) }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,

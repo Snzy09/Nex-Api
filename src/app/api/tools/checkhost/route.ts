@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 const checkHost = {
   api: {
@@ -200,12 +201,16 @@ const checkHost = {
 };
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const host = (body?.host ?? body?.target ?? req.nextUrl.searchParams.get('host') ?? req.nextUrl.searchParams.get('target'))?.toString()?.trim();
   const type = (body?.type ?? req.nextUrl.searchParams.get('type') ?? 'ping')?.toString()?.toLowerCase();
   const port = body?.port ?? req.nextUrl.searchParams.get('port');
   const dnsType = body?.dnsType ?? req.nextUrl.searchParams.get('dnsType');
 
   if (!host) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing host' }).catch(()=>{})
     return NextResponse.json(
       { status: false, creator: siteConfig.api.creator, error: 'Host parameter is required.' },
       { status: 400 }
@@ -218,9 +223,11 @@ async function handleRequest(req: NextRequest, body?: any) {
 
   try {
     const result = await checkHost.check(host, type, paramek);
+    await appendLog({ method, path: fullPath, status: result.status ? 200 : 500, responseTimeMs: Date.now() - start, message: result.status ? undefined : result.message }).catch(()=>{})
     return NextResponse.json({ status: result.status, creator: siteConfig.api.creator, data: result.status ? result.data : null, message: !result.status ? result.message : undefined });
   } catch (err: any) {
     console.error('CheckHost error:', err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
     return NextResponse.json(
       { status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' },
       { status: 500 }

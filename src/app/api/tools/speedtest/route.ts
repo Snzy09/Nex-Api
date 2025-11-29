@@ -1,8 +1,9 @@
 'use server';
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import axios from 'axios';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function runSpeedTest() {
   const startTime = performance.now();
@@ -70,17 +71,22 @@ async function runSpeedTest() {
   };
 }
 
-export async function GET() {
-    try {
-        const result = await runSpeedTest();
-        return NextResponse.json({
-            status: true,
-            creator: siteConfig.api.creator,
-            data: result,
-            timestamp: new Date().toISOString(),
-        });
-    } catch (err: any) {
-        console.error('Speed test error:', err);
-        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
-    }
+export async function GET(req: NextRequest) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
+  try {
+    const result = await runSpeedTest();
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+    return NextResponse.json({
+      status: true,
+      creator: siteConfig.api.creator,
+      data: result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error('Speed test error:', err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
+    return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
+  }
 }

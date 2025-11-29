@@ -4,12 +4,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import FormData from 'form-data';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const imageBase64 = body?.image ?? req.nextUrl.searchParams.get('image');
   const imageUrl = body?.imageUrl ?? req.nextUrl.searchParams.get('imageUrl');
 
   if (!imageBase64 && !imageUrl) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing image' }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,
@@ -48,6 +53,7 @@ async function handleRequest(req: NextRequest, body?: any) {
       timeout: 30000,
     });
 
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json(
       {
         status: true,
@@ -59,6 +65,7 @@ async function handleRequest(req: NextRequest, body?: any) {
   } catch (error: any) {
     console.error('ImgUpscaler2 error:', error?.message || error);
     if (error.response) {
+      await appendLog({ method, path: fullPath, status: error.response.status || 500, responseTimeMs: Date.now() - start, error: String(error.response.data || error.response.statusText) }).catch(()=>{})
       return NextResponse.json(
         {
           status: false,
@@ -70,6 +77,7 @@ async function handleRequest(req: NextRequest, body?: any) {
       );
     }
 
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
     return NextResponse.json(
       {
         status: false,

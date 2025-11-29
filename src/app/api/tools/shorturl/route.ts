@@ -6,6 +6,7 @@ import axios from 'axios';
 import qs from 'qs';
 import zlib from 'zlib';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 async function kualatshort(url: string) {
   const res = await axios.post(
@@ -43,25 +44,32 @@ async function kualatshort(url: string) {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
-    const url = body?.url?.trim() || req.nextUrl.searchParams.get('url')?.trim();
-    if (!url) {
-        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'URL parameter is required' }, { status: 400 });
-    }
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
+  const url = body?.url?.trim() || req.nextUrl.searchParams.get('url')?.trim();
+  if (!url) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing url' }).catch(()=>{})
+    return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'URL parameter is required' }, { status: 400 });
+  }
 
-    try {
-        const result = await kualatshort(url);
-        if (result.status === 'error') {
-            return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: result.message || 'Failed to shorten URL' }, { status: 400 });
-        }
-        return NextResponse.json({
-            status: true,
-            creator: siteConfig.api.creator,
-            data: result,
-        });
-    } catch (err: any) {
-        console.error('Short URL error:', err);
-        return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
+  try {
+    const result = await kualatshort(url);
+    if (result.status === 'error') {
+      await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: result.message || 'Failed to shorten URL' }).catch(()=>{})
+      return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: result.message || 'Failed to shorten URL' }, { status: 400 });
     }
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
+    return NextResponse.json({
+      status: true,
+      creator: siteConfig.api.creator,
+      data: result,
+    });
+  } catch (err: any) {
+    console.error('Short URL error:', err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
+    return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {
