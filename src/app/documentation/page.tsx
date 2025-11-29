@@ -12,7 +12,7 @@ import { TypingText } from '@/components/dashboard/typing-text';
 const docTexts = [
     "Dokumentasi",
     "Next Api",
-    "Open Source"
+    "Free For Everyone",
 ];
 
 export default function DocumentationPage() {
