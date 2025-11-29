@@ -158,11 +158,21 @@ export const siteConfig = {
                 {
                     name: 'ChatGPT 4o',
                     path: '/api/ai/chatgpt4o',
-                    description: 'Chat with ChatGPT 4o via aimlapi proxy (gpt-4o).',
-                    methods: ['GET', 'POST'],
+                    description: 'Chat With ChatGPT 4o.',
+                    methods: ['POST'],
                     status: 'online',
                     parameters: [
                         { name: 'text', type: 'string', description: 'The message to send to ChatGPT 4o.', required: true },
+                    ],
+                },
+                {
+                    name: 'Exa AI',
+                    path: '/api/ai/exaai',
+                    description: 'Chat with Exa AI (chat.exa.ai).',
+                    methods: ['GET', 'POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'text', type: 'string', description: 'The message to send to Exa AI.', required: true },
                     ],
                 },
         {
