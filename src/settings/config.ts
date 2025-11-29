@@ -145,6 +145,16 @@ export const siteConfig = {
                         { name: 'style', type: 'select', description: 'Image style to use.', required: false, options: ['photorealistic', 'digital-art', 'impressionist', 'anime', 'fantasy', 'sci-fi', 'vintage'] },
                     ],
                 },
+                {
+                    name: 'Raka AI',
+                    path: '/api/ai/raka',
+                    description: 'Chat with Raka AI (reka.ai) — send `text` or `message` in POST body.',
+                    methods: ['GET', 'POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'text', type: 'string', description: 'The message to send to Raka AI.', required: true },
+                    ],
+                },
         {
           name: 'Turbo GPT-3.5',
           path: '/api/ai/turbo-gpt3',
