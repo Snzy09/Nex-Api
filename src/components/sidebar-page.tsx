@@ -108,7 +108,7 @@ const DATA = {
     },
     {
       title: 'Documentation',
-      url: '/documentation',
+      url: '',
       icon: BookOpen,
       items: [
         {
