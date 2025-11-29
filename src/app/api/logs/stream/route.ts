@@ -25,40 +25,30 @@ async function initFirebase() {
 }
 
 export async function GET() {
-  const { db } = await initFirebase()
-  if (!db) return NextResponse.json({ status: false, error: 'Firebase not configured' }, { status: 500 })
+  // Stream logs from local file/memory via filelogger
+  const { tailLogs, subscribeLogs } = await import('@/lib/filelogger')
 
-  // SSE stream via Firestore onSnapshot (best-effort). Note: long-lived server-side listeners
-  // may not be supported in all hosting environments. For production consider client-side onSnapshot
-  // or a dedicated logging pipeline.
-  const { collection, query, orderBy, limit: limitFn, onSnapshot } = await import('firebase/firestore')
-
-  const q = query(collection(db, 'logs'), orderBy('timestamp', 'desc'), limitFn(100))
+  const initial = tailLogs(100)
 
   const stream = new ReadableStream({
     start(controller) {
-      let unsub: any = null
+      // send initial batch
       try {
-        unsub = onSnapshot(q, (snap: any) => {
-          snap.docChanges().forEach((change: any) => {
-            if (change.type === 'added' || change.type === 'modified') {
-              const payload = JSON.stringify({ id: change.doc.id, ...change.doc.data() })
-              controller.enqueue(`data: ${payload}\n\n`)
-            }
-          })
-        }, (err: any) => {
-          controller.enqueue(`event: error\ndata: ${JSON.stringify({ error: String(err) })}\n\n`)
-        })
+        controller.enqueue(`data: ${JSON.stringify({ type: 'initial', items: initial })}\n\n`)
       } catch (e) {
-        controller.enqueue(`event: error\ndata: ${JSON.stringify({ error: 'Failed to subscribe to logs' })}\n\n`)
-        controller.close()
+        // ignore
       }
 
-      controller.enqueue('data: [connected]\n\n')
+      const unsubscribe = subscribeLogs((entry: any) => {
+        try {
+          controller.enqueue(`data: ${JSON.stringify({ type: 'add', item: entry })}\n\n`)
+        } catch (e) {
+          // ignore
+        }
+      })
 
-      // teardown
       controller.signal.addEventListener('abort', () => {
-        if (unsub) unsub()
+        unsubscribe()
       })
     }
   })

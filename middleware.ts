@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { metrics } from './src/lib/metrics'
+import { appendLog } from './src/lib/filelogger'
 
 export function middleware(req: NextRequest) {
   try {
@@ -11,6 +12,8 @@ export function middleware(req: NextRequest) {
     const ip = forwarded ? forwarded.split(',')[0].trim() : (req.headers.get('x-real-ip') || 'unknown')
     const ua = req.headers.get('user-agent') || undefined
     metrics.logRequest({ path, method: req.method, ip, ua })
+    // write minimal log to file (middleware has no status/responseTime)
+    appendLog({ method: req.method, host: req.headers.get('host'), path, ip, userAgent: ua })
     console.log(`[api-metrics] ${req.method} ${path} ip=${ip}`)
   } catch (err) {
     // non-fatal

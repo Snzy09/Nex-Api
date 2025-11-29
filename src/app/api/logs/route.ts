@@ -54,6 +54,13 @@ export async function POST(request: Request) {
 
   try {
     const { collection, addDoc } = await import('firebase/firestore')
+    // also append to local access log file for dashboard file-based reads
+    try {
+      const { appendLog } = await import('@/lib/filelogger')
+      appendLog(log).catch(() => {})
+    } catch (e) {
+      // ignore
+    }
     let screenshotUrl: string | null = null
     if (body.screenshotBase64 && storage) {
       try {
