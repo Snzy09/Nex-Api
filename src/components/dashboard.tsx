@@ -2,6 +2,7 @@
 import { apiEndpoints } from "@/settings/config";
 import { TypingText } from "./dashboard/typing-text";
 import { InfoCard } from "./dashboard/info-card";
+import { LogsPanel } from "./dashboard/logs-panel";
 import { Database, List, Cpu, Server, Wifi, Activity, Zap, Clock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -103,29 +104,7 @@ export function Dashboard() {
 
             <div className="grid gap-4 lg:grid-cols-2">
                 <div className="card p-4 bg-card rounded-md">
-                    <h3 className="text-sm font-medium mb-2">Recent API Requests</h3>
-                    <div className="overflow-auto max-h-64">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="text-left text-xs text-muted-foreground">
-                                    <th className="p-2">Time</th>
-                                    <th className="p-2">Method</th>
-                                    <th className="p-2">Path</th>
-                                    <th className="p-2">IP</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {recentLogs.slice(0, 50).map((log: any, idx: number) => (
-                                    <tr key={idx} className="border-t">
-                                        <td className="p-2">{new Date(log.ts).toLocaleTimeString()}</td>
-                                        <td className="p-2 font-mono">{log.method}</td>
-                                        <td className="p-2 font-mono truncate">{log.path}</td>
-                                        <td className="p-2 font-mono">{log.ip}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <LogsPanel />
                 </div>
 
                 <div className="card p-4 bg-card rounded-md">

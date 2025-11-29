@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { metrics } from '@/lib/metrics'
 import os from 'os'
 import fs from 'fs'
+import { appendLog } from '@/lib/filelogger'
 
 function getCpuUsagePercent(): number {
   const load = os.loadavg()[0]
@@ -34,6 +35,7 @@ function readProcNetDev(): { rxBytes: number; txBytes: number } {
 }
 
 export async function GET() {
+  const start = Date.now()
   try {
     const data = metrics.getMetrics()
 
@@ -86,8 +88,35 @@ export async function GET() {
       metrics: data,
     }
 
+    const responseTimeMs = Date.now() - start
+    try {
+      await appendLog({
+        method: 'GET',
+        path: '/api/monitor/metrics',
+        status: 200,
+        responseTimeMs,
+        cpuUsage,
+        memoryUsage: Number(memoryUsage.toFixed(2)),
+        ramUsedMB,
+      })
+    } catch (err) {
+      // best-effort
+    }
+
     return NextResponse.json(payload)
   } catch (e: any) {
+    const responseTimeMs = Date.now() - start
+    try {
+      await appendLog({
+        method: 'GET',
+        path: '/api/monitor/metrics',
+        status: 500,
+        responseTimeMs,
+        error: String(e),
+      })
+    } catch (err) {
+      // ignore
+    }
     return NextResponse.json({ error: String(e) }, { status: 500 })
   }
 }
