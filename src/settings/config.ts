@@ -38,7 +38,7 @@ export const siteConfig = {
   export const apiEndpoints: Record<string, ApiCategory> = {
     ai: {
       name: 'AI',
-      description: 'Endpoints for AI-powered features.',
+      description: 'Endpoints for AI features.',
       endpoints: [
         {
           name: 'Felo AI Search',
@@ -297,7 +297,7 @@ export const siteConfig = {
                     name: 'Gemini Lite',
                     path: '/api/ai/gemini-lite',
                     description: 'Chat with Gemini Lite (gemini-2.0-flash-lite) with optional image input.',
-                    methods: ['GET', 'POST'],
+                    methods: ['POST'],
                     status: 'online',
                     parameters: [
                         { name: 'text', type: 'string', description: 'The message to send to Gemini Lite.', required: true },
@@ -305,9 +305,6 @@ export const siteConfig = {
                         { name: 'imgUrl', type: 'string', description: 'Optional image URL to provide to the model.', required: false },
                     ],
                 },
-
-        
-
       ],
     },
         monitor: {
@@ -334,7 +331,7 @@ export const siteConfig = {
         },              
         anime: {
         name: 'Anime',
-        description: 'Endpoints for fetching anime-related data.',
+        description: 'Endpoints for fetching anime-related daTA.',
         endpoints: [
             {
                 name: 'Livechart',
@@ -356,7 +353,7 @@ export const siteConfig = {
     },
     news: {
         name: 'News',
-        description: 'Endpoints for fetching news from various sources.',
+        description: 'Endpoints for News features.',
         endpoints: [
             {
                 name: 'Kompas News',
@@ -369,7 +366,7 @@ export const siteConfig = {
             {
                 name: 'Dongeng',
                 path: '/api/news/dongeng',
-                description: 'Scrape story data from 1000dongeng.com.',
+                description: 'Get Dongeng Data from 1000dongeng.com.',
                 methods: ['GET', 'POST'],
                 status: 'online',
                 parameters: [
@@ -380,7 +377,7 @@ export const siteConfig = {
     },
     resep: {
         name: 'Resep',
-        description: 'Endpoints for searching and getting recipes.',
+        description: 'Endpoints For Recipe features.',
         endpoints: [
             {
                 name: 'Cari Resep (FatSecret)',
@@ -424,7 +421,7 @@ export const siteConfig = {
     },
     search: {
         name: 'Search',
-        description: 'Endpoints for searching various content.',
+        description: 'Endpoints for Search features.',
         endpoints: [
             {
               name: 'Cuaca',
@@ -571,7 +568,7 @@ export const siteConfig = {
             ,
             {
                 name: 'Lahelu Search',
-                path: '/api/search/lahelu/search',
+                path: '/api/search/lahelu-search',
                 description: 'Search posts on Lahelu by query.',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -582,7 +579,7 @@ export const siteConfig = {
             },
             {
                 name: 'Lahelu Recommendations',
-                path: '/api/search/lahelu/recommendations',
+                path: '/api/search/lahelu-recommendation',
                 description: 'Get recommended posts from Lahelu (FOR_YOU, FRESH, VIRAL).',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -595,7 +592,7 @@ export const siteConfig = {
     },
     downloaders: {
         name: 'Downloaders',
-        description: 'Endpoints for downloading content from various sources.',
+        description: 'Endpoints for Downloader features.',
         endpoints: [
             {
                 name: 'Sfile Downloader',
@@ -779,7 +776,7 @@ export const siteConfig = {
     },
     tools: {
         name: 'Tools',
-        description: 'Utility and tool-based endpoints.',
+        description: 'Endpoints for Tools features.',
         endpoints: [
             {
                 name: 'Image Upscaler',
@@ -972,7 +969,7 @@ export const siteConfig = {
         },
     stalk: {
         name: 'Stalk',
-        description: 'Endpoints for stalking social media profiles.',
+        description: 'Endpoints for Stalk features.',
         endpoints: [
             {
                 name: 'Twitter Stalk',
@@ -1059,7 +1056,7 @@ export const siteConfig = {
     },
     random: {
         name: 'Random',
-        description: 'Endpoints for getting random data like wallpapers.',
+        description: 'Endpoints for Random features.',
         endpoints: [
             {
                 name: 'Wallpaper',
