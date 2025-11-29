@@ -293,6 +293,18 @@ export const siteConfig = {
             { name: 'message', type: 'string', description: 'The message to send to Meta AI.', required: true },
           ],
         },
+                {
+                    name: 'Gemini Lite',
+                    path: '/api/ai/gemini-lite',
+                    description: 'Chat with Gemini Lite (gemini-2.0-flash-lite) with optional image input.',
+                    methods: ['GET', 'POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'text', type: 'string', description: 'The message to send to Gemini Lite.', required: true },
+                        { name: 'model', type: 'string', description: 'Optional Gemini model key.', required: false },
+                        { name: 'imgUrl', type: 'string', description: 'Optional image URL to provide to the model.', required: false },
+                    ],
+                },
 
         
 
