@@ -5,6 +5,7 @@ type LogEntry = any
 
 export function LogsPanel({ limit = 100 }: { limit?: number }) {
   const [logs, setLogs] = useState<LogEntry[]>([])
+  const [requesterIp, setRequesterIp] = useState<string | null>(null)
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -16,6 +17,7 @@ export function LogsPanel({ limit = 100 }: { limit?: number }) {
         const json = await res.json()
         if (!mounted.current) return
         setLogs(json.data ?? [])
+        if (json.requesterIp) setRequesterIp(json.requesterIp)
       } catch (e) {
         // ignore
       }
@@ -27,7 +29,12 @@ export function LogsPanel({ limit = 100 }: { limit?: number }) {
       try {
         const payload = JSON.parse(ev.data)
         if (!mounted.current) return
-        setLogs((prev) => [payload, ...prev].slice(0, Math.max(200, limit)))
+        if (payload.type === 'initial') {
+          setLogs(payload.items ?? [])
+          if (payload.requesterIp) setRequesterIp(payload.requesterIp)
+        } else if (payload.type === 'add') {
+          setLogs((prev) => [payload.item, ...prev].slice(0, Math.max(200, limit)))
+        }
       } catch (e) {
         // ignore
       }
@@ -53,7 +60,6 @@ export function LogsPanel({ limit = 100 }: { limit?: number }) {
               <th className="p-2">Status</th>
               <th className="p-2">Path</th>
               <th className="p-2">IP</th>
-              <th className="p-2">Screenshot</th>
             </tr>
           </thead>
           <tbody>
@@ -63,13 +69,6 @@ export function LogsPanel({ limit = 100 }: { limit?: number }) {
                 <td className="p-2 font-mono">{log.status ?? log.code ?? '-'}</td>
                 <td className="p-2 font-mono truncate">{log.path ?? log.request ?? log.url ?? '-'}</td>
                 <td className="p-2 font-mono">{log.ip ?? '-'}</td>
-                <td className="p-2">
-                  {log.screenshotUrl ? (
-                    <img src={log.screenshotUrl} alt="thumb" className="w-12 h-8 object-cover rounded" />
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                </td>
               </tr>
             ))}
           </tbody>

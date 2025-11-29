@@ -6,7 +6,6 @@ async function initFirebase() {
   try {
     const { initializeApp } = await import('firebase/app')
     const { getFirestore } = await import('firebase/firestore')
-    const { getStorage } = await import('firebase/storage')
     const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID
     if (!apiKey || !projectId) throw new Error('Firebase not configured')
@@ -19,15 +18,14 @@ async function initFirebase() {
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || process.env.FIREBASE_APP_ID,
     })
     const db = getFirestore(app)
-    const storage = getStorage(app)
-    return { db, storage }
+    return { db }
   } catch (err) {
-    return { db: null, storage: null }
+    return { db: null }
   }
 }
 
 export async function POST(request: Request) {
-  const { db, storage } = await initFirebase()
+  const { db } = await initFirebase()
   if (!db) {
     return NextResponse.json({ status: false, error: 'Firebase not configured' }, { status: 500 })
   }
@@ -40,14 +38,16 @@ export async function POST(request: Request) {
   }
 
   const timestamp = body.timestamp ? new Date(body.timestamp).toISOString() : new Date().toISOString()
+  // detect requester IP from headers if not provided in body
+  const headerIp = request.headers.get('x-forwarded-for')?.split(',')?.[0]?.trim() || request.headers.get('x-real-ip') || request.headers.get('cf-connecting-ip') || request.headers.get('fastly-client-ip') || null
   const log: any = {
     timestamp,
     method: body.method || 'GET',
     status: typeof body.status === 'number' ? body.status : null,
     host: body.host || (body.headers && body.headers.host) || null,
     path: body.path || body.url || null,
-    ip: body.ip || null,
-    userAgent: body.userAgent || body.ua || null,
+    ip: body.ip || headerIp || null,
+    userAgent: body.userAgent || body.ua || request.headers.get('user-agent') || null,
     responseTimeMs: typeof body.responseTimeMs === 'number' ? body.responseTimeMs : null,
     message: body.message || null,
   }
@@ -61,24 +61,10 @@ export async function POST(request: Request) {
     } catch (e) {
       // ignore
     }
-    let screenshotUrl: string | null = null
-    if (body.screenshotBase64 && storage) {
-      try {
-        const { ref, uploadString, getDownloadURL } = await import('firebase/storage')
-        const filename = `screenshots/${Date.now()}_${Math.random().toString(36).slice(2,8)}.png`
-        const storageRef = ref(storage, filename)
-        // upload the base64 string (assumed raw base64 without data: prefix)
-        await uploadString(storageRef, body.screenshotBase64, 'base64')
-        screenshotUrl = await getDownloadURL(storageRef)
-        log.screenshotUrl = screenshotUrl
-      } catch (e) {
-        // ignore upload errors but continue
-      }
-    }
 
     const col = collection(db, 'logs')
     const docRef = await addDoc(col, log)
-    return NextResponse.json({ status: true, id: docRef.id, screenshotUrl: screenshotUrl || null })
+    return NextResponse.json({ status: true, id: docRef.id })
   } catch (err: any) {
     return NextResponse.json({ status: false, error: err?.message ?? String(err) }, { status: 500 })
   }

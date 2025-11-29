@@ -24,17 +24,20 @@ async function initFirebase() {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   // Stream logs from local file/memory via filelogger
   const { tailLogs, subscribeLogs } = await import('@/lib/filelogger')
 
   const initial = tailLogs(100)
 
+  // detect requester IP
+  const requesterIp = req.headers.get('x-forwarded-for')?.split(',')?.[0]?.trim() || req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || req.headers.get('fastly-client-ip') || null
+
   const stream = new ReadableStream({
     start(controller) {
-      // send initial batch
+      // send initial batch including requester ip so clients can correlate
       try {
-        controller.enqueue(`data: ${JSON.stringify({ type: 'initial', items: initial })}\n\n`)
+        controller.enqueue(`data: ${JSON.stringify({ type: 'initial', items: initial, requesterIp })}\n\n`)
       } catch (e) {
         // ignore
       }
