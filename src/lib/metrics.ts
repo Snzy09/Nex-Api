@@ -32,15 +32,22 @@ type RouteCounts = Record<string, number>
 export const metrics = {
   totalRequests: 0 as number,
   routes: {} as RouteCounts,
+  // counts for the current day (resets at 00:00 Asia/Jakarta)
+  routesDaily: {} as RouteCounts,
   responseTimes: {} as Record<string, number[]>,
   // recent request logs (most recent first)
   requestLogs: [] as { ts: number; path: string; method: string; ip: string; ua?: string }[],
-  // counts per ip
+  // counts per ip (all-time)
   ipCounts: {} as Record<string, number>,
+  // counts per ip for the current day (resets at 00:00 Asia/Jakarta)
+  ipCountsDaily: {} as Record<string, number>,
+  // ISO timestamp when the current daily window started (Jakarta midnight)
+  dailyWindowStart: null as string | null,
 
   recordRequest(path: string) {
     this.totalRequests++
     this.routes[path] = (this.routes[path] || 0) + 1
+    this.routesDaily[path] = (this.routesDaily[path] || 0) + 1
 
     // Also persist increments to Firebase (if available)
     ;(async () => {
@@ -74,6 +81,7 @@ export const metrics = {
     // cap logs to last 500 entries
     if (this.requestLogs.length > 500) this.requestLogs.length = 500
     this.ipCounts[ip] = (this.ipCounts[ip] || 0) + 1
+    this.ipCountsDaily[ip] = (this.ipCountsDaily[ip] || 0) + 1
 
     // persist to Firebase if possible (best-effort)
     ;(async () => {
@@ -131,8 +139,14 @@ export const metrics = {
       categories[catKey] = info
     }
 
-    // top endpoints by requests
+    // top endpoints by requests (all-time)
     const topEndpoints = Object.entries(this.routes)
+      .map(([p, cnt]) => ({ path: p, requests: cnt, avgResponseMs: avgResponseTime[p] || 0 }))
+      .sort((a, b) => b.requests - a.requests)
+      .slice(0, 20)
+
+    // top endpoints in the current day (resets at Jakarta midnight)
+    const topEndpoints24 = Object.entries(this.routesDaily)
       .map(([p, cnt]) => ({ path: p, requests: cnt, avgResponseMs: avgResponseTime[p] || 0 }))
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 20)
@@ -144,12 +158,86 @@ export const metrics = {
       rawResponseTimes: this.responseTimes,
       categories,
       topEndpoints,
+      topEndpoints24,
       // request logs and ip aggregates
       recentLogs: this.requestLogs.slice(0, 100),
       ipCounts: this.ipCounts,
+      // top requesters this day
+      ipCountsDaily: this.ipCountsDaily,
+      topRequesters24: Object.entries(this.ipCountsDaily).map(([ip, cnt]) => ({ ip, requests: cnt })).sort((a, b) => b.requests - a.requests).slice(0, 20),
+      dailyWindowStart: this.dailyWindowStart,
       now: new Date().toISOString(),
     }
   },
 }
 
 export default metrics
+
+// Schedule daily reset at 00:00 Asia/Jakarta (UTC+7)
+function getNextJakartaMidnightMs() {
+  const now = new Date()
+  // Jakarta is UTC+7
+  const offsetMs = 7 * 60 * 60 * 1000
+  const jakartaNow = new Date(now.getTime() + offsetMs)
+  const y = jakartaNow.getUTCFullYear()
+  const m = jakartaNow.getUTCMonth()
+  const d = jakartaNow.getUTCDate()
+  // next midnight in Jakarta => (y,m,d+1 at 00:00 Jakarta) expressed in UTC ms
+  const nextJakartaMidnightUtcMs = Date.UTC(y, m, d + 1, 0, 0, 0) - offsetMs
+  // If already past, fallback to +24h
+  if (nextJakartaMidnightUtcMs <= Date.now()) return nextJakartaMidnightUtcMs + 24 * 60 * 60 * 1000
+  return nextJakartaMidnightUtcMs
+}
+
+function resetDailyCounters() {
+  try {
+    metrics.routesDaily = {}
+    metrics.ipCountsDaily = {}
+    // compute the Jakarta midnight start ISO for the window we just started
+    try {
+      const offsetMs = 7 * 60 * 60 * 1000
+      const now = new Date()
+      const jakartaNow = new Date(now.getTime() + offsetMs)
+      const y = jakartaNow.getUTCFullYear()
+      const m = jakartaNow.getUTCMonth()
+      const d = jakartaNow.getUTCDate()
+      const jakartaMidnightStartUtcMs = Date.UTC(y, m, d, 0, 0, 0) - offsetMs
+      metrics.dailyWindowStart = new Date(jakartaMidnightStartUtcMs).toISOString()
+    } catch (e) {
+      metrics.dailyWindowStart = new Date().toISOString()
+    }
+    // Note: keep overall totals and recentLogs; we only clear the daily windows
+    console.info('[metrics] reset daily counters at', new Date().toISOString())
+    // Optionally persist reset to Firebase (best-effort)
+    ;(async () => {
+      try {
+        await initFirebaseIfNeeded()
+        if (!firebaseAvailable || !firebaseDb) return
+        const { doc, setDoc } = await import('firebase/firestore')
+        const countersRef = doc(firebaseDb, 'api_metrics', 'daily_counters')
+        await setDoc(countersRef, { resetAt: new Date().toISOString() }, { merge: true })
+      } catch (e) {
+        // ignore firebase errors
+      }
+    })()
+  } catch (e) {
+    // ignore
+  }
+}
+
+function scheduleDailyReset() {
+  try {
+    const nextMs = getNextJakartaMidnightMs()
+    const delay = Math.max(0, nextMs - Date.now())
+    setTimeout(() => {
+      resetDailyCounters()
+      // then schedule every 24h
+      setInterval(resetDailyCounters, 24 * 60 * 60 * 1000)
+    }, delay)
+  } catch (e) {
+    // ignore
+  }
+}
+
+// start scheduler
+scheduleDailyReset()
