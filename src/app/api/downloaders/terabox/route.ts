@@ -2,6 +2,7 @@ import axios from 'axios'
 import https from 'https'
 import FormData from 'form-data'
 import { NextResponse } from 'next/server'
+import { appendLog } from '@/lib/filelogger'
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: true })
 
@@ -31,12 +32,19 @@ async function getNonce(url: string) {
 }
 
 export async function POST(req: Request) {
+  const start = Date.now()
+  const urlObj = new URL(req.url)
+  const fullPath = urlObj.pathname + (urlObj.search || '')
+  const method = req.method || 'POST'
   try {
     const body = await req.json().catch(() => ({}))
     const link = (body.link || new URL(req.url).searchParams.get('link') || '').toString()
     const parse = (body.parse_result === true) || new URL(req.url).searchParams.get('parse') === '1'
 
-    if (!link) return NextResponse.json({ error: true, message: 'Missing `link` parameter.' }, { status: 400 })
+    if (!link) {
+      await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing link' }).catch(()=>{})
+      return NextResponse.json({ error: true, message: 'Missing `link` parameter.' }, { status: 400 })
+    }
 
     const nonce = await getNonce('https://teradownloadr.com/')
     const form = new FormData()
@@ -51,11 +59,14 @@ export async function POST(req: Request) {
     })
 
     if (parse) {
+      await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
       return NextResponse.json({ data: obj(data.data ?? data) })
     }
 
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json({ data: data.data ?? data })
   } catch (error: any) {
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
     return NextResponse.json({ error: true, message: error?.message || String(error) }, { status: 500 })
   }
 }

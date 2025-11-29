@@ -1,11 +1,16 @@
 import axios from 'axios'
 import { load } from 'cheerio'
 import { NextResponse } from 'next/server'
+import { appendLog } from '@/lib/filelogger'
 
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
 
 export async function POST(req: Request) {
+  const start = Date.now()
+  const urlObj = new URL(req.url)
+  const fullPath = urlObj.pathname + (urlObj.search || '')
+  const method = req.method || 'POST'
   try {
     const body = await req.json().catch(() => ({}))
     const url = (body.url || new URL(req.url).searchParams.get('url') || '').trim()
@@ -14,6 +19,7 @@ export async function POST(req: Request) {
     const hasFacebookDomain = /facebook\.(com|net|co|me|watch|[a-z]{2,3})/i.test(url)
     const hasVideoPath = /\/(?:reel|watch|share|videos?|video)\b/i.test(url)
     if (!url || !hasFacebookDomain || !hasVideoPath) {
+      await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'invalid or missing facebook url' }).catch(()=>{})
       return NextResponse.json({ error: true, message: 'Invalid URL, masukkan URL video Facebook yang valid.' }, { status: 400 })
     }
 
@@ -77,8 +83,10 @@ export async function POST(req: Request) {
         }
       })
 
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json({ metadata: { title, duration, thumbnail }, download: { media, music, videos: videoList } })
   } catch (error: any) {
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
     return NextResponse.json({ error: true, message: error?.message || String(error) }, { status: 500 })
   }
 }

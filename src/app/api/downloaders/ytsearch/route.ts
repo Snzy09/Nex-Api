@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 // Basic YouTube search scraping - extracts videoId and title from page HTML
 async function searchYouTube(query: string, limit = 8) {
@@ -43,18 +44,24 @@ async function searchYouTube(query: string, limit = 8) {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const query = (body?.query ?? req.nextUrl.searchParams.get('query'))?.toString();
   const limit = Number((body?.limit ?? req.nextUrl.searchParams.get('limit')) ?? 8);
 
   if (!query) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing query' }).catch(()=>{})
     return NextResponse.json({ status: false, creator: siteConfig.api.creator, message: 'Parameter "query" is required.' }, { status: 400 });
   }
 
   try {
     const results = await searchYouTube(query, limit);
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json({ status: true, creator: siteConfig.api.creator, data: { query, results } }, { status: 200 });
   } catch (err: any) {
     console.error('YT Search error:', err?.message || err);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
     return NextResponse.json({ status: false, creator: siteConfig.api.creator, message: 'Failed to search YouTube.', error: err?.message }, { status: 500 });
   }
 }

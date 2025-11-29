@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 class SoundCloudDownloader {
     private tools = {
@@ -136,14 +137,19 @@ class SoundCloudDownloader {
 }
 
 async function handleRequest(req: NextRequest, body?: any) {
+    const start = Date.now()
+    const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+    const method = req.method
     const url = body?.url?.trim() || req.nextUrl.searchParams.get('url')?.trim();
     if (!url || !url.includes('soundcloud.com')) {
+        await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'invalid or missing soundcloud url' }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: 'A valid SoundCloud track URL is required' }, { status: 400 });
     }
 
     try {
         const scDownloader = new SoundCloudDownloader();
         const result = await scDownloader.download(url);
+        await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
         return NextResponse.json({
             status: true,
             creator: siteConfig.api.creator,
@@ -151,6 +157,7 @@ async function handleRequest(req: NextRequest, body?: any) {
         });
     } catch (err: any) {
         console.error('SoundCloud DL error:', err);
+        await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(err) }).catch(()=>{})
         return NextResponse.json({ status: false, creator: siteConfig.api.creator, error: err.message || 'Internal Server Error' }, { status: 500 });
     }
 }

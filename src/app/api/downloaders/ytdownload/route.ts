@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { siteConfig } from '@/settings/config';
+import { appendLog } from '@/lib/filelogger'
 
 const yt = {
   get baseUrl() {
@@ -105,18 +106,24 @@ const yt = {
 };
 
 async function handleRequest(req: NextRequest, body?: any) {
+  const start = Date.now()
+  const fullPath = req.nextUrl.pathname + (req.nextUrl.search || '')
+  const method = req.method
   const videoId = (body?.videoId ?? req.nextUrl.searchParams.get('videoId'))?.toString();
   const format = (body?.format ?? req.nextUrl.searchParams.get('format'))?.toString() ?? '128kbps';
 
   if (!videoId) {
+    await appendLog({ method, path: fullPath, status: 400, responseTimeMs: Date.now() - start, message: 'missing videoId' }).catch(()=>{})
     return NextResponse.json({ status: false, creator: siteConfig.api.creator, message: 'Parameter "videoId" is required.' }, { status: 400 });
   }
 
   try {
     const result = await yt.download(videoId, format);
+    await appendLog({ method, path: fullPath, status: 200, responseTimeMs: Date.now() - start }).catch(()=>{})
     return NextResponse.json({ status: true, creator: siteConfig.api.creator, data: result }, { status: 200 });
   } catch (error: any) {
     console.error('YT Download error:', error?.message || error);
+    await appendLog({ method, path: fullPath, status: 500, responseTimeMs: Date.now() - start, error: String(error) }).catch(()=>{})
     return NextResponse.json({ status: false, creator: siteConfig.api.creator, message: 'Failed to download.', error: error?.message }, { status: 500 });
   }
 }
