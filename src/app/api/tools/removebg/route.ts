@@ -137,4 +137,4 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export const runtime = 'edge'
+// Use default Node runtime so server-only modules (fs/path) work
