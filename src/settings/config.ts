@@ -780,7 +780,7 @@ export const siteConfig = {
         endpoints: [
             {
                 name: 'Image Upscaler',
-                path: '/api/tools/imgupscaler',
+                path: '/api/tools/upscaler1',
                 description: 'Upscale an image to a higher resolution (2x or 4x).',
                 methods: ['POST'],
                 status: 'online',
@@ -802,7 +802,7 @@ export const siteConfig = {
             },
             {
                 name: 'Img Upscaler 2',
-                path: '/api/tools/imgupscaler2',
+                path: '/api/tools/upscaler2',
                 description: 'Upscale an image (Pixelcut API) — accepts base64 or imageUrl.',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -849,7 +849,7 @@ export const siteConfig = {
             },
             {
                 name: 'ToURL (Top4Top)',
-                path: '/api/tools/tourl-top4top',
+                path: '/api/tools/tourl1',
                 description: 'Upload a file to Top4Top and get a direct link.',
                 methods: ['POST'],
                 status: 'online',
@@ -864,7 +864,7 @@ export const siteConfig = {
             },
             {
                 name: 'ToURL (Zenz)',
-                path: '/api/tools/tourl-zenz',
+                path: '/api/tools/tourl2',
                 description: 'Upload a file to Zenz uploader and get a direct link.',
                 methods: ['POST'],
                 status: 'online',
@@ -911,7 +911,7 @@ export const siteConfig = {
             },
             {
                 name: 'YouTube Summarizer',
-                path: '/api/tools/ytsummarizer',
+                path: '/api/tools/ytsumarize',
                 description: 'Summarize a YouTube video from its URL.',
                 methods: ['POST'],
                 status: 'online',
@@ -969,7 +969,7 @@ export const siteConfig = {
                     name: 'Remove Background (remove.bg)',
                     path: '/api/tools/removebg',
                     description: 'Remove image background using remove.bg API. Accepts multipart `image`, JSON base64 `image`, or `imageUrl`.',
-                    methods: ['GET', 'POST'],
+                    methods: ['POST'],
                     status: 'online',
                     parameters: [
                         { name: 'image', type: 'file', description: 'Image file (multipart form field `image`).', required: false },
@@ -1066,7 +1066,7 @@ export const siteConfig = {
             },
             {
                 name: 'Playlist Analyzer',
-                path: '/api/stalk/playlist-analyzer',
+                path: '/api/stalk/pl-analyzer',
                 description: 'Analyze a Spotify playlist.',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -1103,7 +1103,7 @@ export const siteConfig = {
             },
             {
                 name: 'Wallpaper Search',
-                path: '/api/random/wallpaper-search',
+                path: '/api/random/wp-search',
                 description: 'Search for wallpapers.',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -1118,7 +1118,7 @@ export const siteConfig = {
             },
             {
                 name: 'Wallpaper Download',
-                path: '/api/random/wallpaper-download',
+                path: '/api/random/wp-download',
                 description: 'Get download links for a specific wallpaper.',
                 methods: ['GET', 'POST'],
                 status: 'online',
