@@ -198,6 +198,178 @@ export class Primbon {
     }
   }
 
+  async kecocokan_nama_pasangan(n1: string, n2: string) {
+    try {
+      const txt = await this.postAndText('kecocokan_nama_pasangan.php', { nama1: n1, nama2: n2, proses: ' Submit! ' })
+      const fetchText = txt
+      const hasil = {
+        status: true,
+        message: {
+          nama_anda: n1,
+          nama_pasangan: n2,
+          sisi_positif: fetchText.split('Sisi Positif Anda: ')[1].split('Sisi Negatif Anda: ')[0],
+          sisi_negatif: fetchText.split('Sisi Negatif Anda: ')[1].split('< Hitung Kembali')[0]
+        }
+      }
+      return hasil
+    } catch {
+      return { status: false, message: 'Error, Mungkin Input Yang Anda Masukkan Salah' }
+    }
+  }
+
+  async tanggal_jadian_pernikahan(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('tanggal_jadian_pernikahan.php', { tgl, bln, thn, proses: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { tanggal: fetchText.split('Tanggal: ')[1].split('Karakteristik: ')[0], karakteristik: fetchText.split('Karakteristik: ')[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async sifat_usaha_bisnis(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('sifat_usaha_bisnis.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { hari_lahir: fetchText.split('Hari Lahir Anda: ')[1].split(thn)[0], usaha: fetchText.split(thn)[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async rejeki_hoki_weton(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('rejeki_hoki_weton.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { hari_lahir: fetchText.split('Hari Lahir: ')[1].split(thn)[0], rejeki: fetchText.split(thn)[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async pekerjaan_weton_lahir(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('pekerjaan_weton_lahir.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { hari_lahir: fetchText.split('Hari Lahir: ')[1].split(thn)[0], pekerjaan: fetchText.split(thn)[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async ramalan_nasib(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('ramalan_nasib.php', { tanggal: tgl, bulan: bln, tahun: thn, hitung: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { analisa: fetchText.split('RAMALAN NASIB (METODE PITAGORAS)')[1].split('Angka Akar ')[0].trim() } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async cek_potensi_penyakit(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('cek_potensi_penyakit.php', { tanggal: tgl, bulan: bln, tahun: thn, hitung: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { analisa: fetchText.split('CEK POTENSI PENYAKIT (METODE PITAGORAS)')[1].split('Sektor yg dianalisa:')[0].trim() } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async arti_kartu_tarot(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('arti_kartu_tarot.php', { tgl, bln, thn, kirim: ' Submit! ' })
+      const $ = cheerio.load(txt)
+      const fetchText = $('#body').text()
+      return { status: true, message: { tgl_lahir: fetchText.split('Tgl. Lahir ')[1].split(', memiliki')[0], simbol_tarot: fetchText.split('memiliki simbol tarot:')[1].split('Kartu tarot')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async perhitungan_feng_shui(nama: string, gender: string, tahun: string) {
+    try {
+      const txt = await this.postAndText('perhitungan_feng_shui.php', { nama, gender, tahun, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { nama: fetchText.split('Nama: ')[1].split('Thn. Lahir: ')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async petung_hari_baik(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('petung_hari_baik.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { tgl_lahir: fetchText.split('Watak Hari Menurut Kamarokam')[1].split('Kala Tinantang:')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async hari_sangar_taliwangke(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('hari_sangar_taliwangke.php', { tgl, bln, thn, kirim: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { tgl_lahir: fetchText.split('Primbon Hari Larangan (Tanggal Sangar, Bangas Padewan, Taliwangke)')[1].split('Termasuk hari BIASA')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async primbon_hari_naas(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('primbon_hari_naas.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { hari_lahir: fetchText.split('Hari Lahir Anda: ')[1].split(',')[0], hari_naas: fetchText.split('Hari Naas Anda: ')[1].split('Catatan:')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async rahasia_naga_hari(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('rahasia_naga_hari.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { tgl_lahir: fetchText.split('RAHASIA NAGA HARI')[1].split(',')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async primbon_arah_rejeki(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('primbon_arah_rejeki.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { hari_lahir: fetchText.split('MENURUT PRIMBON GAYATRI:')[1].split(',')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async ramalan_peruntungan(nama: string, tgl: string, bln: string, thn: string, untuk: string) {
+    try {
+      const txt = await this.postAndText('ramalan_peruntungan.php', { nama1: nama, tgl1: tgl, bln1: bln, thn1: thn, thn2: untuk, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { nama, peruntungan_tahun: untuk, result: fetchText.split(`PERUNTUNGAN ANDA DI TAHUN ${untuk}`)[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async weton_jawa(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('weton_jawa.php', { tgl, bln, thn, submit: '  WETON JAWA »  ' })
+      const fetchText = txt
+      return { status: true, message: { tanggal: fetchText.split('Tanggal: ')[1].split('Jumlah Neptu')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async sifat_karakter_tanggal_lahir(nama: string, tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('sifat_karakter_tanggal_lahir.php', { nama, tanggal: tgl, bulan: bln, tahun: thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { nama, tgl_lahir: fetchText.split('Tgl. Lahir : ')[1].split('GARIS HIDUP')[0], garis_hidup: fetchText.split('GARIS HIDUP')[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async potensi_keberuntungan(nama: string, tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('potensi_keberuntungan.php', { nama, tanggal: tgl, bulan: bln, tahun: thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { nama, result: 'Setiap orang' + fetchText.split('Setiap orang')[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async primbon_memancing_ikan(tgl: string, bln: string, thn: string) {
+    try {
+      const txt = await this.postAndText('primbon_memancing_ikan.php', { tgl, bln, thn, submit: ' Submit! ' })
+      const fetchText = txt
+      return { status: true, message: { tgl_mancing: fetchText.split('PRIMBON MEMANCING IKAN')[1].split('Maka hasilnya: ')[0].trim(), result: fetchText.split('Maka hasilnya: ')[1].split('< Hitung Kembali')[0] } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
+  async masa_subur(dateday: string, datemonth: string, dateyear: string, siklus = '28') {
+    try {
+      const txt = await this.postAndText('masa_subur.php', { dateday, datemonth, dateyear, days: siklus, calculator_ok: ' Submit ' })
+      const fetchText = txt
+      return { status: true, message: { result: fetchText.split('KALKULATOR MASA SUBUR')[1].split('Menentukan Ovulasi & Masa Subur')[0].trim() } }
+    } catch { return { status: false, message: 'Error' } }
+  }
+
   async zodiak(z: string) {
     try {
       const res = await axios.get(`https://primbon.com/zodiak/${z}.htm`)

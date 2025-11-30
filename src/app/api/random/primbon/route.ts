@@ -16,6 +16,30 @@ const featureMap: Record<string, { fn: string; params: string[] }> = {
   shio: { fn: 'shio', params: ['q'] },
 }
 
+// Extended short codes for additional Primbon features
+Object.assign(featureMap, {
+  knp: { fn: 'kecocokan_nama_pasangan', params: ['n1', 'n2'] },
+  tjp: { fn: 'tanggal_jadian_pernikahan', params: ['d', 'm', 'y'] },
+  sub: { fn: 'sifat_usaha_bisnis', params: ['d', 'm', 'y'] },
+  rhw: { fn: 'rejeki_hoki_weton', params: ['d', 'm', 'y'] },
+  pwl: { fn: 'pekerjaan_weton_lahir', params: ['d', 'm', 'y'] },
+  rn: { fn: 'ramalan_nasib', params: ['d', 'm', 'y'] },
+  cpp: { fn: 'cek_potensi_penyakit', params: ['d', 'm', 'y'] },
+  akt: { fn: 'arti_kartu_tarot', params: ['d', 'm', 'y'] },
+  pfs: { fn: 'perhitungan_feng_shui', params: ['nama', 'gender', 'tahun'] },
+  phb: { fn: 'petung_hari_baik', params: ['d', 'm', 'y'] },
+  hst: { fn: 'hari_sangar_taliwangke', params: ['d', 'm', 'y'] },
+  phn: { fn: 'primbon_hari_naas', params: ['d', 'm', 'y'] },
+  rnh: { fn: 'rahasia_naga_hari', params: ['d', 'm', 'y'] },
+  par: { fn: 'primbon_arah_rejeki', params: ['d', 'm', 'y'] },
+  rper: { fn: 'ramalan_peruntungan', params: ['nama', 'd', 'm', 'y', 'untuk'] },
+  wj: { fn: 'weton_jawa', params: ['d', 'm', 'y'] },
+  skt: { fn: 'sifat_karakter_tanggal_lahir', params: ['nama', 'd', 'm', 'y'] },
+  pke: { fn: 'potensi_keberuntungan', params: ['nama', 'd', 'm', 'y'] },
+  pmi: { fn: 'primbon_memancing_ikan', params: ['d', 'm', 'y'] },
+  msb: { fn: 'masa_subur', params: ['dateday', 'datemonth', 'dateyear', 'siklus'] },
+})
+
 function getParam(source: URLSearchParams, name: string) {
   return source.get(name) || ''
 }
