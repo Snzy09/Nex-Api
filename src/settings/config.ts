@@ -965,6 +965,18 @@ export const siteConfig = {
                         { name: 'ext', type: 'string', description: 'File extension (e.g., .png, .jpg). Defaults to .bin', required: false },
                     ],
                 },
+                {
+                    name: 'Remove Background (remove.bg)',
+                    path: '/api/tools/removebg',
+                    description: 'Remove image background using remove.bg API. Accepts multipart `image`, JSON base64 `image`, or `imageUrl`.',
+                    methods: ['GET', 'POST'],
+                    status: 'online',
+                    parameters: [
+                        { name: 'image', type: 'file', description: 'Image file (multipart form field `image`).', required: false },
+                        { name: 'image', type: 'string', description: 'Base64 image data (data URL or raw base64).', required: false },
+                        { name: 'imageUrl', type: 'string', description: 'Remote image URL to remove background from.', required: false },
+                    ],
+                },
             ],
         },
     stalk: {
