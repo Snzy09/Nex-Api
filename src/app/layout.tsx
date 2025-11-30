@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster"
+import VercelAnalytics from '@/components/vercel-analytics'
 
 export const metadata: Metadata = {
   title: 'Nex Api 〽️',
@@ -28,6 +29,7 @@ export default function RootLayout({
         >
           {children}
           <Toaster />
+          <VercelAnalytics />
         </ThemeProvider>
       </body>
     </html>
