@@ -2,7 +2,6 @@
 import { apiEndpoints } from "@/settings/config";
 import { TypingText } from "./dashboard/typing-text";
 import { InfoCard } from "./dashboard/info-card";
-import { LogsPanel } from "./dashboard/logs-panel";
 import { Database, List, Cpu, Server, Wifi, Activity, Zap, Clock } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import {
@@ -122,47 +121,9 @@ export function Dashboard() {
                 </div>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-2">
-                <div className="card p-4 bg-card rounded-md">
-                    <LogsPanel />
-                </div>
+                    {/* Recent API Requests and Top Requesters removed per request */}
 
-                <div className="card p-4 bg-card rounded-md">
-                    <h3 className="text-sm font-medium mb-2">Top Requesters (IPs)</h3>
-                    <div className="space-y-2">
-                        {Object.entries(ipCounts).sort((a: any, b: any) => (b[1] as number) - (a[1] as number)).slice(0, 20).map(([ip, cnt]: any) => (
-                            <div key={ip} className="flex items-center justify-between p-2 border rounded">
-                                <div className="font-mono truncate">{ip}</div>
-                                <div className="text-sm font-semibold">{cnt}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            <div className="card p-4 bg-card rounded-md">
-                <h3 className="text-sm font-medium mb-2">Top Endpoints</h3>
-                <div className="overflow-auto max-h-64">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="text-left text-xs text-muted-foreground">
-                                <th className="p-2">Path</th>
-                                <th className="p-2">Requests</th>
-                                <th className="p-2">Avg resp (ms)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topEndpoints.map((ep: any, idx: number) => (
-                                <tr key={idx} className="border-t">
-                                    <td className="p-2 font-mono truncate">{ep.path}</td>
-                                    <td className="p-2">{ep.requests}</td>
-                                    <td className="p-2">{ep.avgResponseMs ?? 0}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            {/* Top Endpoints removed per request */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <InfoCard
                     title="Total Categories"
