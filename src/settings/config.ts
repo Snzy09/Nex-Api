@@ -901,7 +901,7 @@ export const siteConfig = {
             },
             {
                 name: 'YouTube Summarizer',
-                path: '/api/tools/ytsumarize',
+                path: '/api/tools/ytsum',
                 description: 'Summarize a YouTube video from its URL.',
                 methods: ['POST'],
                 status: 'online',
