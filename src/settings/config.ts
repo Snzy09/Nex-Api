@@ -1002,6 +1002,21 @@ export const siteConfig = {
                 ],
             },
             {
+                name: 'GitHub Stalk',
+                path: '/api/stalk/gh',
+                description: 'Get profile information for a GitHub user.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    {
+                        name: 'username',
+                        type: 'string',
+                        description: 'The GitHub username to stalk.',
+                        required: true,
+                    },
+                ],
+            },
+            {
                 name: 'IG Stalk',
                 path: '/api/stalk/ig',
                 description: 'Get profile information and posts for an Instagram user.',
