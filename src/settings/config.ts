@@ -363,16 +363,6 @@ export const siteConfig = {
                 status: 'online',
                 parameters: [],
             },
-            {
-                name: 'Dongeng',
-                path: '/api/news/dongeng',
-                description: 'Get Dongeng Data from 1000dongeng.com.',
-                methods: ['GET', 'POST'],
-                status: 'online',
-                parameters: [
-                    { name: 'url', type: 'string', description: 'The story URL from 1000dongeng.com.', required: true },
-                ],
-            },
         ],
     },
     resep: {
@@ -527,7 +517,7 @@ export const siteConfig = {
                 ],            },
                 {
                 name: 'Google Search',
-                path: '/api/search/google-search',
+                path: '/api/search/google',
                 description: 'Search using Google Search AI for comprehensive results.',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -568,7 +558,7 @@ export const siteConfig = {
             ,
             {
                 name: 'Lahelu Search',
-                path: '/api/search/lahelu-search',
+                path: '/api/search/lahelu',
                 description: 'Search posts on Lahelu by query.',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -579,7 +569,7 @@ export const siteConfig = {
             },
             {
                 name: 'Lahelu Recommendations',
-                path: '/api/search/lahelu-recommendation',
+                path: '/api/search/lahelurec',
                 description: 'Get recommended posts from Lahelu (FOR_YOU, FRESH, VIRAL).',
                 methods: ['GET', 'POST'],
                 status: 'online',
@@ -1099,6 +1089,16 @@ export const siteConfig = {
                         required: true,
                         options: ['home', 'popular', 'featured', 'random', 'collection'],
                     },
+                ],
+            },
+            {
+                name: 'Dongeng',
+                path: '/api/random/dongeng',
+                description: 'Get Dongeng Data from 1000dongeng.com.',
+                methods: ['GET', 'POST'],
+                status: 'online',
+                parameters: [
+                    { name: 'url', type: 'string', description: 'The story URL from 1000dongeng.com.', required: true },
                 ],
             },
             {
